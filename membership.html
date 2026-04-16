@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>KUET Adventure Club - Membership Form</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="p29.css">
+</head>
+<body class="membership-page">
+	<header class="page-hero">
+		<div class="container page-hero-inner">
+			<a href="p29.html" class="back-link">Back to homepage</a>
+			<p class="eyebrow">Membership Application</p>
+			<h1>Apply for KUET Adventure Club</h1>
+			<p>
+				Fill in your details below. This page is kept separate from the homepage so the application stays focused and clean.
+			</p>
+		</div>
+	</header>
+
+	<main class="container form-page-wrap">
+		<form class="membership-form form-page-form" id="membershipForm" action="#" method="post" novalidate autocomplete="off">
+			<div class="form-grid">
+				<div class="form-row">
+					<label for="fullName">Full Name</label>
+					<input type="text" id="fullName" name="fullName" placeholder="Your full name" required autocomplete="off" spellcheck="false">
+				</div>
+				<div class="form-row">
+					<label for="memberType">Member Type</label>
+					<select id="memberType" name="memberType" required autocomplete="off">
+						<option value="student">Student</option>
+						<option value="alumni">Alumni</option>
+					</select>
+				</div>
+				<div class="form-row">
+					<label for="department">Department</label>
+					<input type="text" id="department" name="department" placeholder="e.g. CSE, EEE, Civil" required autocomplete="off" spellcheck="false" autocapitalize="off">
+				</div>
+				<div class="form-row">
+					<label for="rollId">Roll / ID</label>
+					<input type="text" id="rollId" name="rollId" placeholder="Student roll or alumni ID" required autocomplete="off" spellcheck="false" autocapitalize="off">
+				</div>
+				<div class="form-row">
+					<label for="batch">Batch</label>
+					<input type="text" id="batch" name="batch" placeholder="e.g. 2022, 2023" required autocomplete="off" spellcheck="false" autocapitalize="off">
+				</div>
+				<div class="form-row">
+					<label for="mailbox">Mailbox</label>
+					<input type="email" id="mailbox" name="mailbox" placeholder="your email address" required autocomplete="off" spellcheck="false">
+				</div>
+				<div class="form-row">
+					<label for="phoneNumber">Phone Number</label>
+					<input type="tel" id="phoneNumber" name="phoneNumber" placeholder="01XXXXXXXXX" required autocomplete="off" spellcheck="false" inputmode="tel">
+				</div>
+				<div class="form-row full-width">
+					<span class="form-label">Do you have a valid passport?</span>
+					<div class="radio-group">
+						<label><input type="radio" name="passport" value="yes" required> Yes</label>
+						<label><input type="radio" name="passport" value="no" required> No</label>
+					</div>
+				</div>
+				<div class="form-row full-width">
+					<label for="message">Why do you want to join?</label>
+					<textarea id="message" name="message" rows="5" placeholder="Write a short note..." required autocomplete="off" spellcheck="false"></textarea>
+				</div>
+			</div>
+			<div class="form-actions">
+				<button type="submit" class="btn btn-primary form-submit">Submit Application</button>
+				<a href="p29.html" class="btn btn-ghost form-cancel">Cancel</a>
+			</div>
+			<p class="form-status" id="formStatus" aria-live="polite"></p>
+		</form>
+	</main>
+	<script src="p29.js"></script>
+</body>
+</html>

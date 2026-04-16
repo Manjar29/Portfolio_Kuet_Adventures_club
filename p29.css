@@ -107,6 +107,37 @@ body {
 	animation: rise 0.9s ease;
 }
 
+.hero-grid {
+	display: grid;
+	grid-template-columns: 1.2fr 0.8fr;
+	gap: 1.6rem;
+	align-items: center;
+}
+
+.hero-copy {
+	max-width: 740px;
+}
+
+.hero-photo-wrap {
+	margin: 0;
+	border-radius: 24px;
+	overflow: hidden;
+	border: 3px solid rgba(255, 255, 255, 0.25);
+	box-shadow: 0 18px 34px rgba(8, 28, 17, 0.34);
+	transform: rotate(-1.2deg);
+	justify-self: end;
+	max-width: 390px;
+	width: 100%;
+}
+
+.hero-photo {
+	display: block;
+	width: 100%;
+	height: 100%;
+	min-height: 300px;
+	object-fit: cover;
+}
+
 .eyebrow {
 	color: var(--accent);
 	font-size: 0.9rem;
@@ -120,6 +151,44 @@ body {
 	font-size: clamp(2rem, 5.8vw, 4.25rem);
 	font-family: "Sora", sans-serif;
 	line-height: 1.05;
+}
+
+.hero-title {
+	position: relative;
+	display: inline-block;
+	isolation: isolate;
+	animation: titlePop 900ms cubic-bezier(0.2, 1.1, 0.3, 1) both;
+}
+
+.hero-title span {
+	position: relative;
+	display: inline-block;
+	z-index: 1;
+	text-shadow: 0 0 0 rgba(255, 255, 255, 0.2);
+	animation: titleGlow 2.8s ease-in-out infinite;
+}
+
+.hero-title::before,
+.hero-title::after {
+	content: "✦";
+	position: absolute;
+	color: #ff9cb3;
+	font-size: clamp(0.95rem, 1.5vw, 1.2rem);
+	text-shadow: 0 0 14px rgba(255, 226, 156, 0.85);
+	opacity: 0.95;
+	pointer-events: none;
+	animation: sparkleFloat 2.8s ease-in-out infinite;
+}
+
+.hero-title::before {
+	top: -0.55em;
+	left: -0.75em;
+}
+
+.hero-title::after {
+	right: -0.55em;
+	bottom: 0.1em;
+	animation-delay: 0.7s;
 }
 
 .hero-subtext {
@@ -225,11 +294,17 @@ body {
 	font-weight: 700;
 }
 
-.join-wrap {
+.membership-grid {
 	display: grid;
-	grid-template-columns: 1.25fr 1fr auto;
-	gap: 1.2rem;
-	align-items: center;
+	grid-template-columns: 1fr 1.05fr;
+	gap: 1.5rem;
+	align-items: start;
+}
+
+.form-open-btn {
+	margin: 1rem 0 1.1rem;
+	border: none;
+	cursor: pointer;
 }
 
 .join-list {
@@ -243,6 +318,186 @@ body {
 	padding: 0.55rem 0.8rem;
 	border-radius: 10px;
 	border-left: 3px solid var(--brand);
+}
+
+.membership-form {
+	background: rgba(255, 255, 255, 0.8);
+	backdrop-filter: blur(8px);
+	border: 1px solid rgba(18, 106, 58, 0.12);
+	border-radius: 24px;
+	padding: 1.25rem;
+	box-shadow: var(--shadow);
+	display: grid;
+	gap: 0.95rem;
+}
+
+.form-row {
+	display: grid;
+	gap: 0.35rem;
+}
+
+.form-row label {
+	font-weight: 600;
+	color: var(--muted);
+}
+
+.form-label {
+	font-weight: 600;
+	color: var(--muted);
+}
+
+.form-row input,
+.form-row select,
+.form-row textarea {
+	width: 100%;
+	border: 1px solid rgba(21, 49, 31, 0.15);
+	border-radius: 12px;
+	padding: 0.82rem 0.9rem;
+	font: inherit;
+	background: #fff;
+	color: var(--text);
+	outline: none;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.radio-group {
+	display: flex;
+	gap: 1rem;
+	flex-wrap: wrap;
+	padding: 0.4rem 0 0.1rem;
+}
+
+.radio-group label {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.45rem;
+	font-weight: 500;
+	color: var(--text);
+}
+
+.radio-group input {
+	width: auto;
+	accent-color: var(--brand);
+}
+
+.form-row input:focus,
+.form-row select:focus,
+.form-row textarea:focus {
+	border-color: var(--brand);
+	box-shadow: 0 0 0 3px rgba(18, 106, 58, 0.12);
+}
+
+.form-submit {
+	justify-self: start;
+	cursor: pointer;
+	border: none;
+}
+
+.form-status {
+	min-height: 1.4em;
+	font-weight: 600;
+	color: var(--brand-dark);
+}
+
+.success-panel {
+	margin-top: 1.25rem;
+	padding: 1.5rem;
+	border-radius: 24px;
+	background: linear-gradient(145deg, #ffffff, #edf6e8);
+	border: 1px solid rgba(18, 106, 58, 0.14);
+	box-shadow: var(--shadow);
+	display: grid;
+	gap: 0.9rem;
+}
+
+.success-panel h2 {
+	font-family: "Sora", sans-serif;
+	font-size: clamp(1.5rem, 3vw, 2.2rem);
+	line-height: 1.15;
+}
+
+.success-actions {
+	display: flex;
+	gap: 0.9rem;
+	flex-wrap: wrap;
+}
+
+.membership-preview {
+	margin-top: 1rem;
+}
+
+.page-hero {
+	background: linear-gradient(130deg, #1e633d 0%, #184e31 45%, #0f3823 100%);
+	color: #f9fff8;
+	padding: 2rem 0 3rem;
+}
+
+.page-hero-inner {
+	display: grid;
+	gap: 0.85rem;
+}
+
+.back-link {
+	color: #efffef;
+	text-decoration: none;
+	font-weight: 600;
+}
+
+.back-link:hover {
+	text-decoration: underline;
+}
+
+.page-hero h1 {
+	font-family: "Sora", sans-serif;
+	font-size: clamp(2rem, 5vw, 3.5rem);
+	line-height: 1.08;
+}
+
+.page-hero p {
+	max-width: 700px;
+	color: #ddf0e3;
+}
+
+.form-page-wrap {
+	padding: 2.5rem 0 4rem;
+}
+
+.form-page-form {
+	padding: 1.4rem;
+	border-radius: 26px;
+	box-shadow: var(--shadow);
+	background: rgba(255, 255, 255, 0.92);
+	backdrop-filter: blur(10px);
+}
+
+.form-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 1rem;
+}
+
+.full-width {
+	grid-column: 1 / -1;
+}
+
+.form-actions {
+	margin-top: 1.2rem;
+	display: flex;
+	gap: 0.9rem;
+	flex-wrap: wrap;
+}
+
+.form-cancel {
+	border: 1.5px solid rgba(21, 49, 31, 0.15);
+	color: var(--text);
+}
+
+.form-page-wrap .membership-form {
+	gap: 0;
+}
+
+.form-page-wrap .membership-form .form-row {
+	margin-bottom: 0;
 }
 
 .footer {
@@ -269,8 +524,63 @@ body {
 	}
 }
 
+@keyframes titlePop {
+	0% {
+		opacity: 0;
+		transform: scale(0.72) translateY(18px) rotate(-2deg);
+		filter: blur(2px);
+	}
+	70% {
+		opacity: 1;
+		transform: scale(1.06) translateY(0) rotate(0deg);
+		filter: blur(0);
+	}
+	100% {
+		opacity: 1;
+		transform: scale(1) translateY(0) rotate(0deg);
+		filter: blur(0);
+	}
+}
+
+@keyframes titleGlow {
+	0%,
+	100% {
+		text-shadow:
+			0 0 0 rgba(255, 255, 255, 0.2),
+			0 0 10px rgba(255, 226, 156, 0.18);
+	}
+	50% {
+		text-shadow:
+			0 0 6px rgba(255, 255, 255, 0.45),
+			0 0 18px rgba(255, 226, 156, 0.45),
+			0 0 28px rgba(255, 226, 156, 0.22);
+	}
+}
+
+@keyframes sparkleFloat {
+	0%,
+	100% {
+		transform: translateY(0) scale(0.95) rotate(0deg);
+		opacity: 0.75;
+	}
+	50% {
+		transform: translateY(-10px) scale(1.2) rotate(18deg);
+		opacity: 1;
+	}
+}
+
 @media (max-width: 960px) {
-	.join-wrap {
+	.hero-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.hero-photo-wrap {
+		justify-self: start;
+		max-width: 520px;
+		transform: rotate(0deg);
+	}
+
+	.membership-grid {
 		grid-template-columns: 1fr;
 	}
 
@@ -296,7 +606,31 @@ body {
 		margin-top: 1.4rem;
 	}
 
+	.form-submit {
+		width: 100%;
+	}
+
+	.form-open-btn {
+		width: 100%;
+	}
+
+	.hero-photo {
+		min-height: 230px;
+	}
+
 	.btn {
+		width: 100%;
+	}
+
+	.form-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.form-actions .btn {
+		width: 100%;
+	}
+
+	.success-actions .btn {
 		width: 100%;
 	}
 }
