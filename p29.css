@@ -283,6 +283,15 @@ body {
 	gap: 1rem;
 }
 
+.event-actions {
+	margin-top: 0.8rem;
+}
+
+.event-register-btn {
+	border: none;
+	cursor: pointer;
+}
+
 .event-date {
 	display: inline-block;
 	margin-bottom: 0.35rem;

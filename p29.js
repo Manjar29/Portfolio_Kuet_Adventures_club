@@ -1,5 +1,10 @@
 
 document.addEventListener("DOMContentLoaded", function () {
+	setupMembershipForm();
+	setupEventRegistrationForm();
+});
+
+function setupMembershipForm() {
 	var form = document.getElementById("membershipForm");
 	var status = document.getElementById("formStatus");
 
@@ -49,6 +54,58 @@ document.addEventListener("DOMContentLoaded", function () {
 
 		window.location.href = "success.html";
 	});
-});
+}
+
+function setupEventRegistrationForm() {
+	var form = document.getElementById("eventRegisterForm");
+	var status = document.getElementById("eventRegisterStatus");
+
+	if (!form || !status) {
+		return;
+	}
+
+	var eventTitle = document.getElementById("registerEventTitle");
+	var eventNameInput = document.getElementById("eventName");
+	var query = new URLSearchParams(window.location.search);
+	var eventName = query.get("event") || "KUET Adventure Event";
+
+	if (eventTitle) {
+		eventTitle.textContent = "Register for " + eventName;
+	}
+	if (eventNameInput) {
+		eventNameInput.value = eventName;
+	}
+
+	form.addEventListener("submit", function (event) {
+		event.preventDefault();
+
+		var name = document.getElementById("regName");
+		var department = document.getElementById("regDepartment");
+		var clubId = document.getElementById("regClubId");
+		var roll = document.getElementById("regRoll");
+		var transaction = document.getElementById("regTxn");
+		var errorMessage = "";
+
+		if (!name.value.trim()) {
+			errorMessage = "Please enter your name.";
+		} else if (!department.value.trim()) {
+			errorMessage = "Please enter your department.";
+		} else if (!clubId.value.trim()) {
+			errorMessage = "Please enter your club ID.";
+		} else if (!roll.value.trim()) {
+			errorMessage = "Please enter your roll.";
+		} else if (!/^bk\d{4}$/i.test(transaction.value.trim())) {
+			errorMessage = "Transaction ID format must be bk + last 4 digits (example: bk1298).";
+		}
+
+		if (errorMessage) {
+			status.textContent = errorMessage;
+			status.style.color = "#9a3412";
+			return;
+		}
+
+		window.location.href = "register-success.html";
+	});
+}
 
 

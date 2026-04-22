@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Event Registration - KUET Adventure Club</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="p29.css">
+</head>
+<body class="membership-page">
+	<header class="page-hero">
+		<div class="container page-hero-inner">
+			<a href="p29.html" class="back-link">Back to homepage</a>
+			<p class="eyebrow">Event Registration</p>
+			<h1 id="registerEventTitle">Register for KUET Adventure Event</h1>
+			<p>
+				Complete this form to secure your seat.
+			</p>
+		</div>
+	</header>
+
+	<main class="container form-page-wrap">
+		<form class="membership-form form-page-form" id="eventRegisterForm" novalidate autocomplete="off">
+			<input type="hidden" id="eventName" name="eventName">
+			<div class="form-grid">
+				<div class="form-row">
+					<label for="regName">Name</label>
+					<input type="text" id="regName" name="regName" placeholder="Your full name" required autocomplete="off">
+				</div>
+				<div class="form-row">
+					<label for="regDepartment">Department</label>
+					<input type="text" id="regDepartment" name="regDepartment" placeholder="e.g. CSE, EEE" required autocomplete="off" autocapitalize="off" spellcheck="false">
+				</div>
+				<div class="form-row">
+					<label for="regClubId">Club ID</label>
+					<input type="text" id="regClubId" name="regClubId" placeholder="Your club ID" required autocomplete="off" spellcheck="false">
+				</div>
+				<div class="form-row">
+					<label for="regRoll">Roll</label>
+					<input type="text" id="regRoll" name="regRoll" placeholder="Your academic roll" required autocomplete="off" spellcheck="false">
+				</div>
+				<div class="form-row full-width">
+					<label for="regTxn">Transaction ID</label>
+					<input type="text" id="regTxn" name="regTxn" placeholder="Hint: bk + last 4 digits (example: bk1298)" required autocomplete="off" autocapitalize="off" spellcheck="false">
+				</div>
+			</div>
+			<div class="form-actions">
+				<button type="submit" class="btn btn-primary form-submit">Submit Registration</button>
+				<a href="p29.html" class="btn btn-ghost form-cancel">Cancel</a>
+			</div>
+			<p class="form-status" id="eventRegisterStatus" aria-live="polite"></p>
+		</form>
+	</main>
+	<script src="p29.js"></script>
+</body>
+</html>
