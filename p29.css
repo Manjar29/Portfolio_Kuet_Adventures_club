@@ -285,11 +285,26 @@ body {
 
 .event-actions {
 	margin-top: 0.8rem;
+	display: flex;
+	gap: 0.6rem;
+	flex-wrap: wrap;
 }
 
 .event-register-btn {
 	border: none;
 	cursor: pointer;
+}
+
+.event-view-btn {
+	border: 1.5px solid rgba(18, 106, 58, 0.4);
+	background: #f4faf1;
+	color: var(--brand-dark);
+}
+
+.event-view-btn.is-active {
+	background: #e8f5e3;
+	border-color: rgba(18, 106, 58, 0.65);
+	cursor: default;
 }
 
 .event-date {
@@ -471,6 +486,36 @@ body {
 	padding: 2.5rem 0 4rem;
 }
 
+.detail-top-actions {
+	margin-top: 0.55rem;
+}
+
+.event-detail-card {
+	background: rgba(255, 255, 255, 0.92);
+	border: 1px solid rgba(18, 106, 58, 0.14);
+	border-radius: 24px;
+	padding: 1.4rem;
+	box-shadow: var(--shadow);
+}
+
+.event-detail-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 1rem;
+}
+
+.event-detail-grid h2 {
+	font-family: "Sora", sans-serif;
+	font-size: clamp(1.2rem, 2.6vw, 1.55rem);
+	margin-bottom: 0.45rem;
+}
+
+.event-detail-list {
+	padding-left: 1.1rem;
+	display: grid;
+	gap: 0.35rem;
+}
+
 .form-page-form {
 	padding: 1.4rem;
 	border-radius: 26px;
@@ -632,6 +677,10 @@ body {
 	}
 
 	.form-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.event-detail-grid {
 		grid-template-columns: 1fr;
 	}
 

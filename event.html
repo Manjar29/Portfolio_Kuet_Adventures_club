@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Event Details - KUET Adventure Club</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="p29.css">
+</head>
+<body class="membership-page">
+	<header class="page-hero">
+		<div class="container page-hero-inner">
+			<a href="p29.html" class="back-link">Back to homepage</a>
+			<p class="eyebrow">Event Details</p>
+			<h1 id="eventDetailTitle">KUET Adventure Event</h1>
+			<p id="eventDetailSubtitle">Detailed information, safety, schedule, and payment details are shown below.</p>
+			<div class="event-actions detail-top-actions">
+				<a href="#" class="btn btn-primary event-register-btn" id="detailRegisterBtn">Register</a>
+			</div>
+		</div>
+	</header>
+
+	<main class="container form-page-wrap">
+		<section class="event-detail-card">
+			<div class="event-detail-grid">
+				<div>
+					<h2>Overview</h2>
+					<p id="eventOverview">Loading event overview...</p>
+				</div>
+				<div>
+					<h2>Schedule</h2>
+					<ul id="eventSchedule" class="event-detail-list"></ul>
+				</div>
+				<div>
+					<h2>Requirements</h2>
+					<ul id="eventRequirements" class="event-detail-list"></ul>
+				</div>
+				<div>
+					<h2>Payment &amp; Transaction</h2>
+					<ul id="eventPayment" class="event-detail-list"></ul>
+				</div>
+			</div>
+		</section>
+	</main>
+	<script src="p29.js"></script>
+</body>
+</html>
