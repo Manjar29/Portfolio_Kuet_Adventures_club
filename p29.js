@@ -117,8 +117,10 @@ function setupEventDetailsPage() {
 	var requirementsList = document.getElementById("eventRequirements");
 	var paymentList = document.getElementById("eventPayment");
 	var registerBtn = document.getElementById("detailRegisterBtn");
+	var photoWrap = document.getElementById("eventDetailPhotoWrap");
+	var photo = document.getElementById("eventDetailPhoto");
 
-	if (!title || !subtitle || !overview || !scheduleList || !requirementsList || !paymentList || !registerBtn) {
+	if (!title || !subtitle || !overview || !scheduleList || !requirementsList || !paymentList || !registerBtn || !photoWrap || !photo) {
 		return;
 	}
 
@@ -129,6 +131,10 @@ function setupEventDetailsPage() {
 		"Sundarbans Eco Exploration": {
 			subtitle: "Mangrove ecosystem learning camp with guided exploration and nature safety orientation.",
 			overview: "A one-day eco-focused expedition for observation, awareness, and team-based field learning.",
+			image: {
+				src: "sundarban.webp",
+				alt: "Sundarbans nature scene for KUET Adventure Club event"
+			},
 			schedule: [
 				"Reporting at KUET gate: 5:30 AM",
 				"Departure by bus: 6:00 AM",
@@ -153,6 +159,10 @@ function setupEventDetailsPage() {
 		"KUET to Bagerhat Cycling Run": {
 			subtitle: "Long-distance group cycling event focusing endurance, road discipline, and hydration planning.",
 			overview: "A 70 km controlled route ride with mentor checkpoints and pace groups.",
+			image: {
+				src: "cycling.webp",
+				alt: "KUET Adventure Club cycling event photo"
+			},
 			schedule: [
 				"Bike check and briefing: 5:00 AM",
 				"Ride start: 5:45 AM",
@@ -177,6 +187,10 @@ function setupEventDetailsPage() {
 		"Adventure Bootcamp 3.0": {
 			subtitle: "Two-day intensive bootcamp with team challenges, map reading, and survival practice.",
 			overview: "Hands-on field training to improve leadership, planning, and outdoor emergency response.",
+			image: {
+				src: "shelter.webp",
+				alt: "Adventure Bootcamp shelter building photo"
+			},
 			schedule: [
 				"Day 1 reporting: 8:00 AM",
 				"Shelter and knot workshops: Day 1",
@@ -212,6 +226,14 @@ function setupEventDetailsPage() {
 	subtitle.textContent = details.subtitle;
 	overview.textContent = details.overview;
 	registerBtn.href = "register.html?event=" + encodeURIComponent(eventName);
+
+	if (details.image) {
+		photo.src = details.image.src;
+		photo.alt = details.image.alt;
+		photoWrap.hidden = false;
+	} else {
+		photoWrap.hidden = true;
+	}
 
 	renderList(scheduleList, details.schedule);
 	renderList(requirementsList, details.requirements);
