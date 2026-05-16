@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Registrations - KUET Adventure Club</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="p29.css">
+	<style>
+		.registrations-table-wrap {
+			overflow-x: auto;
+		}
+		.registrations-table {
+			width: 100%;
+			border-collapse: collapse;
+			background: rgba(255, 255, 255, 0.92);
+			border-radius: 18px;
+			overflow: hidden;
+		}
+		.registrations-table th,
+		.registrations-table td {
+			padding: 0.9rem 1rem;
+			text-align: left;
+			border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+			vertical-align: top;
+		}
+		.registrations-table th {
+			background: #102a43;
+			color: #fff;
+			font-weight: 600;
+			white-space: nowrap;
+		}
+		.registrations-table tbody tr:nth-child(even) {
+			background: rgba(15, 23, 42, 0.03);
+		}
+		.registrations-status {
+			margin: 0 0 1rem;
+			font-weight: 500;
+		}
+	</style>
+</head>
+<body class="membership-page">
+	<header class="page-hero">
+		<div class="container page-hero-inner">
+			<a href="admin.html" class="back-link">Back to admin panel</a>
+			<p class="eyebrow">Admin</p>
+			<h1>Submitted Registrations</h1>
+			<p>Live membership requests loaded from the ASP.NET API.</p>
+		</div>
+	</header>
+
+	<main class="container form-page-wrap">
+		<section class="membership-form form-page-form">
+			<p class="form-status registrations-status" id="registrationsStatus" aria-live="polite">Loading registrations...</p>
+			<div class="registrations-table-wrap">
+				<table class="registrations-table" aria-label="Membership registrations">
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>Name</th>
+							<th>Type</th>
+							<th>Department</th>
+							<th>Roll / ID</th>
+							<th>Batch</th>
+							<th>Mailbox</th>
+							<th>Phone</th>
+							<th>Passport</th>
+							<th>Submitted</th>
+						</tr>
+					</thead>
+					<tbody id="registrationsBody"></tbody>
+				</table>
+			</div>
+		</section>
+	</main>
+
+	<script>
+		(function () {
+			var status = document.getElementById("registrationsStatus");
+			var body = document.getElementById("registrationsBody");
+			var apiUrl = "http://localhost:5000/api/memberships";
+
+			function escapeHtml(value) {
+				return String(value)
+					.replace(/&/g, "&amp;")
+					.replace(/</g, "&lt;")
+					.replace(/>/g, "&gt;")
+					.replace(/\"/g, "&quot;")
+					.replace(/'/g, "&#39;");
+			}
+
+			fetch(apiUrl)
+				.then(function (response) {
+					if (!response.ok) {
+						throw new Error("Failed to load registrations.");
+					}
+					return response.json();
+				})
+				.then(function (rows) {
+					if (!Array.isArray(rows) || rows.length === 0) {
+						status.textContent = "No registrations found yet.";
+						body.innerHTML = "";
+						return;
+					}
+
+					status.textContent = "Loaded " + rows.length + " registration(s).";
+					body.innerHTML = rows.map(function (row) {
+						return "<tr>" +
+							"<td>" + escapeHtml(row.id) + "</td>" +
+							"<td>" + escapeHtml(row.fullName) + "</td>" +
+							"<td>" + escapeHtml(row.memberType) + "</td>" +
+							"<td>" + escapeHtml(row.department) + "</td>" +
+							"<td>" + escapeHtml(row.rollId) + "</td>" +
+							"<td>" + escapeHtml(row.batch) + "</td>" +
+							"<td>" + escapeHtml(row.mailbox) + "</td>" +
+							"<td>" + escapeHtml(row.phoneNumber) + "</td>" +
+							"<td>" + (row.hasPassport ? "Yes" : "No") + "</td>" +
+							"<td>" + escapeHtml(row.submittedAtUtc || "") + "</td>" +
+							"</tr>";
+						}).join("");
+				})
+				.catch(function (error) {
+					status.textContent = "Unable to load registrations: " + error.message;
+					body.innerHTML = "";
+				});
+		})();
+	</script>
+</body>
+</html>
