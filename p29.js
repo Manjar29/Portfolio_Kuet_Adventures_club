@@ -53,7 +53,36 @@ function setupMembershipForm() {
 			return;
 		}
 
-		window.location.href = "success.html";
+		var payload = {
+			fullName: fullName.value.trim(),
+			memberType: memberType.value.trim(),
+			department: department.value.trim(),
+			rollId: rollId.value.trim(),
+			batch: batch.value.trim(),
+			mailbox: mailbox.value.trim(),
+			phoneNumber: phoneNumber.value.trim(),
+			hasPassport: passport.value === "yes",
+			message: message.value.trim()
+		};
+
+		var apiUrl = "http://localhost:5000/api/memberships";
+		fetch(apiUrl, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify(payload)
+		})
+			.then(function (response) {
+				if (!response.ok) {
+					throw new Error("Failed to submit membership application.");
+				}
+				window.location.href = "success.html";
+			})
+			.catch(function () {
+				status.textContent = "Could not connect to ASP.NET API. Start backend and try again.";
+				status.style.color = "#9a3412";
+			});
 	});
 }
 
