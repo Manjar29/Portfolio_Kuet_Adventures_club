@@ -220,6 +220,12 @@ body {
 	transform: translateY(-2px);
 }
 
+.btn.is-disabled {
+	pointer-events: none;
+	opacity: 0.6;
+	filter: grayscale(0.2);
+}
+
 .btn-primary {
 	background: linear-gradient(135deg, var(--accent), #ffd977);
 	color: #372700;
@@ -237,6 +243,10 @@ body {
 
 .section-alt {
 	background: linear-gradient(145deg, var(--bg-alt), #e6efe1);
+}
+
+.event-item.is-archived {
+	display: none;
 }
 
 .section-heading h2 {
@@ -397,6 +407,38 @@ body {
 	color: var(--text);
 	outline: none;
 	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.asp-input {
+	width: 100%;
+	border: 1px solid rgba(21, 49, 31, 0.15);
+	border-radius: 12px;
+	padding: 0.82rem 0.9rem;
+	font: inherit;
+	background: #fff;
+	color: var(--text);
+	outline: none;
+}
+
+.asp-grid {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.92rem;
+	overflow-x: auto;
+	display: block;
+}
+
+.asp-grid th,
+.asp-grid td {
+	padding: 0.55rem;
+	border: 1px solid rgba(18, 106, 58, 0.14);
+	text-align: left;
+	white-space: nowrap;
+}
+
+.asp-grid th {
+	background: #edf7ea;
+	font-family: "Sora", sans-serif;
 }
 
 .radio-group {

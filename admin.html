@@ -8,6 +8,42 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="p29.css">
+	<style>
+		.admin-controls {
+			display: grid;
+			gap: 1rem;
+		}
+		.admin-field {
+			display: grid;
+			gap: 0.45rem;
+		}
+		.admin-field label {
+			font-weight: 600;
+		}
+		.admin-select {
+			width: 100%;
+			padding: 0.8rem 0.95rem;
+			border-radius: 14px;
+			border: 1px solid rgba(15, 23, 42, 0.16);
+			font: inherit;
+		}
+		.admin-actions {
+			display: flex;
+			gap: 0.7rem;
+			flex-wrap: wrap;
+		}
+		.admin-list {
+			list-style: none;
+			display: grid;
+			gap: 0.5rem;
+			margin-top: 0.8rem;
+		}
+		.admin-list li {
+			background: rgba(15, 23, 42, 0.04);
+			border-radius: 12px;
+			padding: 0.6rem 0.8rem;
+		}
+	</style>
 </head>
 <body class="membership-page">
 	<header class="page-hero">
@@ -15,7 +51,7 @@
 			<a href="p29.html" class="back-link">Back to homepage</a>
 			<p class="eyebrow">Admin</p>
 			<h1>Event Control Options</h1>
-			<p>This page shows admin control options only. No functionality is changed.</p>
+			<p>This page shows admin control options and links to the active registrations view.</p>
 		</div>
 	</header>
 
@@ -23,9 +59,28 @@
 		<section class="event-detail-card">
 			<div class="event-detail-grid">
 				<div class="card">
-					<h3>Add New Event</h3>
-					<p>Create a new club event and include date, details, and requirements.</p>
-					<button type="button" class="btn btn-primary">Add Event</button>
+					<h3>Manage Events</h3>
+					<p>Archive completed events so they disappear from the public event list.</p>
+					<div class="admin-controls">
+						<div class="admin-field">
+							<label for="eventArchiveSelect">Choose event</label>
+							<select id="eventArchiveSelect" class="admin-select">
+								<option value="Sundarbans Eco Exploration">Sundarbans Eco Exploration</option>
+								<option value="KUET to Bagerhat Cycling Run">KUET to Bagerhat Cycling Run</option>
+								<option value="Adventure Bootcamp 3.0">Adventure Bootcamp 3.0</option>
+							</select>
+						</div>
+						<div class="admin-actions">
+							<button type="button" class="btn btn-primary" id="archiveEventBtn">Archive</button>
+							<button type="button" class="btn btn-primary" id="unarchiveEventBtn">Unarchive</button>
+							<button type="button" class="btn btn-ghost" id="clearArchiveBtn">Clear All</button>
+						</div>
+						<p class="form-status admin-note" id="archiveStatus" aria-live="polite"></p>
+						<div>
+							<strong>Archived events</strong>
+							<ul class="admin-list" id="archivedEventList"></ul>
+						</div>
+					</div>
 				</div>
 				<div class="card">
 					<h3>Update Event Info</h3>
@@ -35,15 +90,86 @@
 				<div class="card">
 					<h3>Manage Registrations</h3>
 					<p>Review submitted registrations and participant details.</p>
-					<button type="button" class="btn btn-primary">View Registrations</button>
-				</div>
-				<div class="card">
-					<h3>Archive Event</h3>
-					<p>Move completed events to archive for future reference.</p>
-					<button type="button" class="btn btn-primary">Archive Event</button>
+					<a class="btn btn-primary" href="admin-registrations.html">View Registrations</a>
 				</div>
 			</div>
 		</section>
 	</main>
+
+	<script>
+		(function () {
+			var apiBaseUrl = "http://localhost:5000";
+			var archiveApiUrl = apiBaseUrl + "/api/events/archived";
+			var select = document.getElementById("eventArchiveSelect");
+			var archiveBtn = document.getElementById("archiveEventBtn");
+			var unarchiveBtn = document.getElementById("unarchiveEventBtn");
+			var clearBtn = document.getElementById("clearArchiveBtn");
+			var status = document.getElementById("archiveStatus");
+			var list = document.getElementById("archivedEventList");
+
+			function render() {
+				fetch(archiveApiUrl)
+					.then(function (response) {
+						if (!response.ok) {
+							throw new Error("Failed to load archived events.");
+						}
+						return response.json();
+					})
+					.then(function (archived) {
+						if (!Array.isArray(archived) || archived.length === 0) {
+							status.textContent = "No archived events yet.";
+							list.innerHTML = "<li>None</li>";
+							return;
+						}
+
+						status.textContent = archived.length + " archived event(s).";
+						list.innerHTML = archived.map(function (name) {
+							return "<li>" + name + "</li>";
+						}).join("");
+					})
+					.catch(function (error) {
+						status.textContent = "Unable to load archive state: " + error.message;
+						list.innerHTML = "<li>Unavailable</li>";
+					});
+			}
+
+			function archiveSelected() {
+				var eventName = select.value;
+				fetch(archiveApiUrl + "/" + encodeURIComponent(eventName), { method: "POST" })
+					.then(function (response) {
+						if (response.status !== 204) {
+							throw new Error("Archive failed.");
+						}
+						render();
+					});
+			}
+
+			function unarchiveSelected() {
+				var eventName = select.value;
+				fetch(archiveApiUrl + "/" + encodeURIComponent(eventName), { method: "DELETE" })
+					.then(function (response) {
+						if (response.status !== 204) {
+							throw new Error("Unarchive failed.");
+						}
+						render();
+					});
+			}
+
+			function clearArchived() {
+				fetch(archiveApiUrl, { method: "DELETE" })
+					.then(function (response) {
+						if (response.status !== 204) {
+							throw new Error("Clear failed.");
+						}
+						render();
+					});
+			}
+
+			archiveBtn.addEventListener("click", archiveSelected);
+			unarchiveBtn.addEventListener("click", unarchiveSelected);
+			clearBtn.addEventListener("click", clearArchived);
+			render();
+		})();
+	</script>
 </body>
 </html>

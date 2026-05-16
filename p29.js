@@ -1,9 +1,47 @@
 
 document.addEventListener("DOMContentLoaded", function () {
+	setupArchivedEvents();
 	setupMembershipForm();
 	setupEventRegistrationForm();
 	setupEventDetailsPage();
 });
+
+var apiBaseUrl = "http://localhost:5000";
+var archiveApiUrl = apiBaseUrl + "/api/events/archived";
+
+function getArchivedEvents() {
+	return fetch(archiveApiUrl)
+		.then(function (response) {
+			if (!response.ok) {
+				throw new Error("Failed to load archived events.");
+			}
+			return response.json();
+		})
+		.then(function (archived) {
+			return Array.isArray(archived) ? archived : [];
+		})
+		.catch(function () {
+			return [];
+		});
+}
+
+function isArchivedEvent(eventName) {
+	return getArchivedEvents().then(function (archived) {
+		return archived.indexOf(eventName) !== -1;
+	});
+}
+
+function setupArchivedEvents() {
+	getArchivedEvents().then(function (archivedEvents) {
+		var cards = document.querySelectorAll(".event-item[data-event-name]");
+
+		for (var i = 0; i < cards.length; i++) {
+			var card = cards[i];
+			var eventName = card.getAttribute("data-event-name");
+			card.classList.toggle("is-archived", archivedEvents.indexOf(eventName) !== -1);
+		}
+	});
+}
 
 function setupMembershipForm() {
 	var form = document.getElementById("membershipForm");
@@ -250,23 +288,50 @@ function setupEventDetailsPage() {
 		requirements: ["Basic participant requirements will be shared by email."],
 		payment: ["bKash number: 01700-000000", "Bank account number: 123456789000", "Follow transaction format: bk + last 4 digits."]
 	};
-
 	title.textContent = eventName;
-	subtitle.textContent = details.subtitle;
-	overview.textContent = details.overview;
-	registerBtn.href = "register.html?event=" + encodeURIComponent(eventName);
+	getArchivedEvents().then(function (archivedEvents) {
+		var archived = archivedEvents.indexOf(eventName) !== -1;
 
-	if (details.image) {
-		photo.src = details.image.src;
-		photo.alt = details.image.alt;
-		photoWrap.hidden = false;
-	} else {
-		photoWrap.hidden = true;
-	}
+		subtitle.textContent = archived ? details.subtitle + " This event is archived and registrations are closed." : details.subtitle;
+		overview.textContent = details.overview;
+		registerBtn.href = archived ? "#" : "register.html?event=" + encodeURIComponent(eventName);
+		registerBtn.textContent = archived ? "Archived Event" : "Register";
+		registerBtn.classList.toggle("is-disabled", archived);
+		registerBtn.setAttribute("aria-disabled", archived ? "true" : "false");
+		registerBtn.setAttribute("tabindex", archived ? "-1" : "0");
 
-	renderList(scheduleList, details.schedule);
-	renderList(requirementsList, details.requirements);
-	renderList(paymentList, details.payment);
+		if (details.image) {
+			photo.src = details.image.src;
+			photo.alt = details.image.alt;
+			photoWrap.hidden = false;
+		} else {
+			photoWrap.hidden = true;
+		}
+
+		renderList(scheduleList, details.schedule);
+		renderList(requirementsList, details.requirements);
+		renderList(paymentList, details.payment);
+	}).catch(function () {
+		subtitle.textContent = details.subtitle;
+		overview.textContent = details.overview;
+		registerBtn.href = "register.html?event=" + encodeURIComponent(eventName);
+		registerBtn.textContent = "Register";
+		registerBtn.classList.remove("is-disabled");
+		registerBtn.removeAttribute("aria-disabled");
+		registerBtn.removeAttribute("tabindex");
+
+		if (details.image) {
+			photo.src = details.image.src;
+			photo.alt = details.image.alt;
+			photoWrap.hidden = false;
+		} else {
+			photoWrap.hidden = true;
+		}
+
+		renderList(scheduleList, details.schedule);
+		renderList(requirementsList, details.requirements);
+		renderList(paymentList, details.payment);
+	});
 }
 
 function renderList(target, values) {
