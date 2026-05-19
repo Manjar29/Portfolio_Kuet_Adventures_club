@@ -23,7 +23,8 @@ public partial class AdminMemberships : System.Web.UI.Page
 
     private void LoadMemberships()
     {
-        var connectionString = ConfigurationManager.ConnectionStrings["KuetDb"]?.ConnectionString;
+        var connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"]?.ConnectionString
+            ?? ConfigurationManager.ConnectionStrings["KuetDb"]?.ConnectionString;
         if (string.IsNullOrWhiteSpace(connectionString))
         {
             lblAdminStatus.Text = "Database connection is missing in web.config.";
