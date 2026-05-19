@@ -1,0 +1,6 @@
+@KuetAdventure.Api_HostAddress = http://localhost:5136
+
+GET {{KuetAdventure.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -7,6 +7,14 @@ public partial class AdminMemberships : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {
+        // Require admin authentication (session or cookie)
+        if (!IsAuthenticated())
+        {
+            var returnUrl = Server.UrlEncode(Request.RawUrl);
+            Response.Redirect("AdminLogin.aspx?returnUrl=" + returnUrl);
+            return;
+        }
+
         if (!IsPostBack)
         {
             LoadMemberships();
@@ -47,5 +55,23 @@ public partial class AdminMemberships : System.Web.UI.Page
             lblAdminStatus.Text = "Load failed: " + ex.Message;
             lblAdminStatus.ForeColor = System.Drawing.Color.Firebrick;
         }
+    }
+
+    private bool IsAuthenticated()
+    {
+        // Check session first
+        if (Session["IsAdmin"] is bool isAdmin && isAdmin)
+            return true;
+
+        // Fallback to cookie
+        var cookie = Request.Cookies["IsAdmin"];
+        if (cookie != null && cookie.Value == "1")
+        {
+            // Rehydrate session from cookie
+            Session["IsAdmin"] = true;
+            return true;
+        }
+
+        return false;
     }
 }

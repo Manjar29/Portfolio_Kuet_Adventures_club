@@ -1,0 +1,13 @@
+CREATE TABLE MembershipApplications (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    FullName NVARCHAR(200) NOT NULL,
+    MemberType NVARCHAR(50) NOT NULL,
+    Department NVARCHAR(100) NOT NULL,
+    RollId NVARCHAR(100) NOT NULL,
+    Batch NVARCHAR(50) NOT NULL,
+    Mailbox NVARCHAR(200) NOT NULL,
+    PhoneNumber NVARCHAR(50) NOT NULL,
+    HasPassport BIT NOT NULL,
+    Message NVARCHAR(MAX) NOT NULL,
+    SubmittedAtUtc DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME()
+);

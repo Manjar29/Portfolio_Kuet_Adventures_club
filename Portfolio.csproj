@@ -52,6 +52,9 @@
     <Content Include="AdminMemberships.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
+    <Content Include="AdminLogin.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="Membership.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
@@ -61,6 +64,10 @@
   <ItemGroup>
     <Compile Include="AdminMemberships.aspx.cs">
       <DependentUpon>AdminMemberships.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AdminLogin.aspx.cs">
+      <DependentUpon>AdminLogin.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="AdminMemberships.aspx.designer.cs">

@@ -1,0 +1,7 @@
+C:\Users\Acer\OneDrive\Desktop\Portfolio\obj\Debug\Portfolio.csproj.AssemblyReference.cache
+C:\Users\Acer\OneDrive\Desktop\Portfolio\obj\Debug\Portfolio.csproj.CoreCompileInputs.cache
+C:\Users\Acer\OneDrive\Desktop\Portfolio\bin\Portfolio.dll.config
+C:\Users\Acer\OneDrive\Desktop\Portfolio\bin\Portfolio.dll
+C:\Users\Acer\OneDrive\Desktop\Portfolio\bin\Portfolio.pdb
+C:\Users\Acer\OneDrive\Desktop\Portfolio\obj\Debug\Portfolio.dll
+C:\Users\Acer\OneDrive\Desktop\Portfolio\obj\Debug\Portfolio.pdb

@@ -1,0 +1,218 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "KuetAdventure.Api | v1",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000"
+    }
+  ],
+  "paths": {
+    "/api/Memberships": {
+      "post": {
+        "tags": [
+          "Memberships"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MembershipCreateRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MembershipCreateRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/MembershipCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Memberships"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MembershipApplication"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MembershipApplication"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MembershipApplication"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Memberships/{id}": {
+      "get": {
+        "tags": [
+          "Memberships"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/MembershipApplication"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MembershipApplication"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MembershipApplication"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "MembershipApplication": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "memberType": {
+            "type": "string"
+          },
+          "department": {
+            "type": "string"
+          },
+          "rollId": {
+            "type": "string"
+          },
+          "batch": {
+            "type": "string"
+          },
+          "mailbox": {
+            "type": "string"
+          },
+          "phoneNumber": {
+            "type": "string"
+          },
+          "hasPassport": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "submittedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "MembershipCreateRequest": {
+        "required": [
+          "fullName",
+          "memberType",
+          "department",
+          "rollId",
+          "batch",
+          "mailbox",
+          "phoneNumber",
+          "message"
+        ],
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string"
+          },
+          "memberType": {
+            "type": "string"
+          },
+          "department": {
+            "type": "string"
+          },
+          "rollId": {
+            "type": "string"
+          },
+          "batch": {
+            "type": "string"
+          },
+          "mailbox": {
+            "type": "string"
+          },
+          "phoneNumber": {
+            "type": "string"
+          },
+          "hasPassport": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Memberships"
+    }
+  ]
+}
