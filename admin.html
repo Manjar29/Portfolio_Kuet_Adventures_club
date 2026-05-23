@@ -9,17 +9,9 @@
 	<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="p29.css">
 	<style>
-		.admin-controls {
-			display: grid;
-			gap: 1rem;
-		}
-		.admin-field {
-			display: grid;
-			gap: 0.45rem;
-		}
-		.admin-field label {
-			font-weight: 600;
-		}
+		.admin-controls { display: grid; gap: 1rem; }
+		.admin-field { display: grid; gap: 0.45rem; }
+		.admin-field label { font-weight: 600; }
 		.admin-select {
 			width: 100%;
 			padding: 0.8rem 0.95rem;
@@ -27,22 +19,54 @@
 			border: 1px solid rgba(15, 23, 42, 0.16);
 			font: inherit;
 		}
-		.admin-actions {
-			display: flex;
-			gap: 0.7rem;
-			flex-wrap: wrap;
-		}
-		.admin-list {
-			list-style: none;
-			display: grid;
-			gap: 0.5rem;
-			margin-top: 0.8rem;
-		}
+		.admin-actions { display: flex; gap: 0.7rem; flex-wrap: wrap; }
+		.admin-list { list-style: none; display: grid; gap: 0.5rem; margin-top: 0.8rem; }
 		.admin-list li {
 			background: rgba(15, 23, 42, 0.04);
 			border-radius: 12px;
 			padding: 0.6rem 0.8rem;
 		}
+		.archived-name {
+			color: #991b1b;
+			text-decoration: line-through;
+			text-decoration-thickness: 2px;
+		}
+		.event-registration-table-wrap { overflow-x: auto; }
+		.event-registration-table {
+			width: 100%;
+			border-collapse: collapse;
+			margin-top: 0.75rem;
+		}
+		a.row-action {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			text-decoration: none;
+		}
+		.event-registration-table th,
+		.event-registration-table td {
+			padding: 0.65rem 0.75rem;
+			border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+			text-align: left;
+			vertical-align: top;
+		}
+		.event-registration-table th {
+			background: rgba(16, 42, 67, 0.92);
+			color: #fff;
+		}
+		.count-badge {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			min-width: 2.2rem;
+			padding: 0.2rem 0.6rem;
+			border-radius: 999px;
+			background: #102a43;
+			color: #fff;
+			font-weight: 700;
+			margin-left: 0.4rem;
+		}
+		.event-summary-list { margin-top: 0.75rem; }
 	</style>
 </head>
 <body class="membership-page">
@@ -51,7 +75,7 @@
 			<a href="p29.html" class="back-link">Back to homepage</a>
 			<p class="eyebrow">Admin</p>
 			<h1>Event Control Options</h1>
-			<p>This page shows admin control options and links to the active registrations view.</p>
+			<p>Archive expired events, manage event details, open event registration, and review submitted registrations.</p>
 		</div>
 	</header>
 
@@ -59,116 +83,297 @@
 		<section class="event-detail-card">
 			<div class="event-detail-grid">
 				<div class="card">
-					<h3>Manage Events</h3>
-					<p>Archive completed events so they disappear from the public event list.</p>
+					<h3>Archive / Unarchive Events</h3>
+					<p>Expired events stay archived. Archived events are shown as red crossed names on homepage.</p>
 					<div class="admin-controls">
 						<div class="admin-field">
 							<label for="eventArchiveSelect">Choose event</label>
-							<select id="eventArchiveSelect" class="admin-select">
-								<option value="Sundarbans Eco Exploration">Sundarbans Eco Exploration</option>
-								<option value="KUET to Bagerhat Cycling Run">KUET to Bagerhat Cycling Run</option>
-								<option value="Adventure Bootcamp 3.0">Adventure Bootcamp 3.0</option>
-							</select>
+							<select id="eventArchiveSelect" class="admin-select"></select>
 						</div>
 						<div class="admin-actions">
 							<button type="button" class="btn btn-primary" id="archiveEventBtn">Archive</button>
 							<button type="button" class="btn btn-primary" id="unarchiveEventBtn">Unarchive</button>
-							<button type="button" class="btn btn-ghost" id="clearArchiveBtn">Clear All</button>
+							<button type="button" class="btn btn-ghost" id="clearArchiveBtn">Clear Non-expired Archives</button>
 						</div>
 						<p class="form-status admin-note" id="archiveStatus" aria-live="polite"></p>
 						<div>
 							<strong>Archived events</strong>
 							<ul class="admin-list" id="archivedEventList"></ul>
 						</div>
+						<a class="btn btn-ghost" href="admin-event-manager.html">Open Event Manager (Add/Update/Delete)</a>
 					</div>
 				</div>
+
 				<div class="card">
-					<h3>Update Event Info</h3>
-					<p>Edit event title, schedule, and payment instructions.</p>
-					<button type="button" class="btn btn-primary">Update Event</button>
+					<h3>Update / Add / Delete Event</h3>
+					<p>Use the dedicated page to update existing events, add new events, upload photo, archive, or delete permanently.</p>
+					<a class="btn btn-primary" href="admin-event-manager.html">Go to Event Manager Page</a>
 				</div>
+
 				<div class="card">
 					<h3>Manage Registrations</h3>
-					<p>Review submitted registrations and participant details.</p>
-					<a class="btn btn-primary" href="AdminLogin.aspx">View Registrations</a>
+					<p>Review submitted club memberships and approve or delete requests.</p>
+					<a class="btn btn-primary" href="AdminLogin.html?returnUrl=admin-registrations.html">View Registrations</a>
+				</div>
+
+				<div class="card">
+					<h3>Event Registrations</h3>
+					<p>Choose an event to view registration rows and delete submitted registrations from this panel.</p>
+					<div class="admin-controls">
+						<div class="admin-field">
+							<label for="eventRegistrationSelect">Choose event</label>
+							<select id="eventRegistrationSelect" class="admin-select"></select>
+						</div>
+						<p class="form-status admin-note" id="eventRegistrationStatus" aria-live="polite"></p>
+						<div>
+							<strong>Event counts</strong>
+							<ul class="admin-list event-summary-list" id="eventRegistrationSummary"></ul>
+						</div>
+						<div>
+							<strong id="eventRegistrationHeading">Selected event registrations</strong>
+							<div class="event-registration-table-wrap">
+								<table class="event-registration-table" aria-label="Event registrations">
+									<thead>
+										<tr>
+											<th>ID</th>
+											<th>Name</th>
+											<th>Club ID</th>
+											<th>Roll</th>
+											<th>Txn</th>
+											<th>Submitted</th>
+											<th>Actions</th>
+										</tr>
+									</thead>
+									<tbody id="eventRegistrationBody"></tbody>
+								</table>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</section>
 	</main>
 
+	<script src="copy-protect.js?v=20260523a"></script>
+	<script src="api-client.js?v=20260523c"></script>
 	<script>
 		(function () {
-			var apiBaseUrl = "http://localhost:5000";
-			var archiveApiUrl = apiBaseUrl + "/api/events/archived";
-			var select = document.getElementById("eventArchiveSelect");
+			var eventsCatalogApiPath = "/api/events/catalog?includeArchived=true";
+			var archiveByIdApiPath = "/api/events/catalog";
+			var archiveClearApiPath = "/api/events/archived";
+			var eventArchiveSelect = document.getElementById("eventArchiveSelect");
 			var archiveBtn = document.getElementById("archiveEventBtn");
 			var unarchiveBtn = document.getElementById("unarchiveEventBtn");
 			var clearBtn = document.getElementById("clearArchiveBtn");
-			var status = document.getElementById("archiveStatus");
-			var list = document.getElementById("archivedEventList");
+			var archiveStatus = document.getElementById("archiveStatus");
+			var archivedList = document.getElementById("archivedEventList");
+			var eventRegistrationSelect = document.getElementById("eventRegistrationSelect");
+			var eventRegistrationStatus = document.getElementById("eventRegistrationStatus");
+			var eventRegistrationSummary = document.getElementById("eventRegistrationSummary");
+			var eventRegistrationBody = document.getElementById("eventRegistrationBody");
+			var eventRegistrationHeading = document.getElementById("eventRegistrationHeading");
+			var eventRegistrationsApiPath = "/api/event-registrations";
+			var eventRegistrationSummaryApiPath = "/api/event-registrations/summary";
+			var eventByName = Object.create(null);
 
-			function render() {
-				fetch(archiveApiUrl)
-					.then(function (response) {
-						if (!response.ok) {
-							throw new Error("Failed to load archived events.");
+			function escapeHtml(value) {
+				return String(value)
+					.replace(/&/g, "&amp;")
+					.replace(/</g, "&lt;")
+					.replace(/>/g, "&gt;")
+					.replace(/\"/g, "&quot;")
+					.replace(/'/g, "&#39;");
+			}
+
+			function loadEventOptions() {
+				return window.KUET_API.requestJson(eventsCatalogApiPath)
+					.then(function (events) {
+						if (!Array.isArray(events)) {
+							events = [];
 						}
-						return response.json();
-					})
-					.then(function (archived) {
-						if (!Array.isArray(archived) || archived.length === 0) {
-							status.textContent = "No archived events yet.";
-							list.innerHTML = "<li>None</li>";
+
+						eventByName = Object.create(null);
+						events.forEach(function (item) {
+							eventByName[item.eventName] = item;
+						});
+
+						var optionsHtml = events.map(function (item) {
+							return "<option value='" + escapeHtml(item.eventName) + "'>" + escapeHtml(item.eventName) + "</option>";
+						}).join("");
+
+						eventArchiveSelect.innerHTML = optionsHtml;
+						eventRegistrationSelect.innerHTML = optionsHtml;
+
+						if (!events.length) {
+							archiveStatus.textContent = "No events available. Add one from Event Manager.";
+							eventRegistrationStatus.textContent = "No events available. Add one from Event Manager.";
+							archivedList.innerHTML = "<li>None</li>";
+							eventRegistrationBody.innerHTML = "";
+							eventRegistrationSummary.innerHTML = "<li>No event registrations yet.</li>";
 							return;
 						}
 
-						status.textContent = archived.length + " archived event(s).";
-						list.innerHTML = archived.map(function (name) {
-							return "<li>" + name + "</li>";
-						}).join("");
+						renderArchivedFromCatalog(events);
+						refreshEventRegistrations();
 					})
 					.catch(function (error) {
-						status.textContent = "Unable to load archive state: " + error.message;
-						list.innerHTML = "<li>Unavailable</li>";
+						archiveStatus.textContent = "Unable to load events: " + (error && error.message ? error.message : error);
+						eventRegistrationStatus.textContent = archiveStatus.textContent;
 					});
 			}
 
-			function archiveSelected() {
-				var eventName = select.value;
-				fetch(archiveApiUrl + "/" + encodeURIComponent(eventName), { method: "POST" })
-					.then(function (response) {
-						if (response.status !== 204) {
-							throw new Error("Archive failed.");
-						}
-						render();
-					});
+			function renderArchivedFromCatalog(events) {
+				var archived = events.filter(function (item) { return !!item.isArchived; });
+				if (!archived.length) {
+					archiveStatus.textContent = "No archived events yet.";
+					archivedList.innerHTML = "<li>None</li>";
+					return;
+				}
+
+				archiveStatus.textContent = archived.length + " archived event(s).";
+				archivedList.innerHTML = archived.map(function (item) {
+					var label = item.isExpired ? item.eventName + " (expired)" : item.eventName;
+					return "<li><span class='archived-name'>" + escapeHtml(label) + "</span></li>";
+				}).join("");
 			}
 
-			function unarchiveSelected() {
-				var eventName = select.value;
-				fetch(archiveApiUrl + "/" + encodeURIComponent(eventName), { method: "DELETE" })
+			function setArchiveState(archive) {
+				var eventName = eventArchiveSelect.value;
+				var selected = eventByName[eventName];
+				if (!selected) {
+					archiveStatus.textContent = "Select an event first.";
+					return;
+				}
+
+				window.KUET_API.requestApi(archiveByIdApiPath + "/" + encodeURIComponent(selected.id) + "/archive", {
+					method: archive ? "POST" : "DELETE"
+				})
 					.then(function (response) {
 						if (response.status !== 204) {
-							throw new Error("Unarchive failed.");
+							throw new Error((archive ? "Archive" : "Unarchive") + " failed.");
 						}
-						render();
+						return loadEventOptions();
+					})
+					.catch(function (error) {
+						archiveStatus.textContent = "Unable to update archive state: " + (error && error.message ? error.message : error);
 					});
 			}
 
 			function clearArchived() {
-				fetch(archiveApiUrl, { method: "DELETE" })
+				window.KUET_API.requestApi(archiveClearApiPath, { method: "DELETE" })
 					.then(function (response) {
 						if (response.status !== 204) {
 							throw new Error("Clear failed.");
 						}
-						render();
+						return loadEventOptions();
+					})
+					.catch(function (error) {
+						archiveStatus.textContent = "Unable to clear archives: " + (error && error.message ? error.message : error);
 					});
 			}
 
-			archiveBtn.addEventListener("click", archiveSelected);
-			unarchiveBtn.addEventListener("click", unarchiveSelected);
+			function renderEventRegistrationSummary(summary) {
+				if (!Array.isArray(summary) || summary.length === 0) {
+					eventRegistrationSummary.innerHTML = "<li>No event registrations yet.</li>";
+					return;
+				}
+
+				eventRegistrationSummary.innerHTML = summary.map(function (item) {
+					var name = escapeHtml(item.eventName || item.EventName || "");
+					var count = escapeHtml((item.count || item.Count || 0));
+					var deleted = (item.deletedCount || item.DeletedCount || 0);
+					var deletedHtml = deleted && deleted > 0 ? "<span class='count-badge' style='background:#b91c1c;margin-left:0.5rem'>D:" + escapeHtml(deleted) + "</span>" : "";
+					return "<li><strong>" + name + "</strong><span class='count-badge'>" + count + "</span>" + deletedHtml + "</li>";
+				}).join("");
+			}
+
+			function renderEventRegistrations(eventName) {
+				eventRegistrationHeading.textContent = eventName + " registrations";
+				eventRegistrationStatus.textContent = "Loading registrations...";
+
+				return window.KUET_API.requestJson(eventRegistrationsApiPath + "?eventName=" + encodeURIComponent(eventName))
+					.then(function (rows) {
+						if (!Array.isArray(rows) || rows.length === 0) {
+							eventRegistrationStatus.textContent = "No registrations for this event yet.";
+							eventRegistrationBody.innerHTML = "";
+							return;
+						}
+
+						eventRegistrationStatus.textContent = rows.length + " registration(s).";
+						eventRegistrationBody.innerHTML = rows.map(function (row) {
+							return "<tr>" +
+								"<td>" + escapeHtml(row.id) + "</td>" +
+								"<td>" + escapeHtml(row.fullName) + "</td>" +
+								"<td>" + escapeHtml(row.clubId) + "</td>" +
+								"<td>" + escapeHtml(row.roll) + "</td>" +
+								"<td>" + escapeHtml(row.transactionId) + "</td>" +
+								"<td>" + escapeHtml(row.submittedAtUtc || "") + "</td>" +
+								"<td class='actions-cell'>" +
+									"<a class='row-action view' href='admin-event-registration.html?id=" + encodeURIComponent(row.id) + "'>View</a>" +
+									"<button type='button' class='row-action delete' data-event-action='delete' data-id='" + escapeHtml(row.id) + "'>Delete</button>" +
+								"</td>" +
+							"</tr>";
+						}).join("");
+					})
+					.catch(function (error) {
+						eventRegistrationStatus.textContent = "Unable to load event registrations: " + (error && error.message ? error.message : error);
+						eventRegistrationBody.innerHTML = "";
+					});
+			}
+
+			function refreshEventRegistrations() {
+				var eventName = eventRegistrationSelect.value;
+				if (!eventName) {
+					eventRegistrationBody.innerHTML = "";
+					return Promise.resolve();
+				}
+
+				return Promise.all([
+					window.KUET_API.requestJson(eventRegistrationSummaryApiPath).then(function (summary) {
+						renderEventRegistrationSummary(summary);
+					}),
+					renderEventRegistrations(eventName)
+				]).catch(function (error) {
+					eventRegistrationStatus.textContent = "Unable to load event registrations: " + (error && error.message ? error.message : error);
+				});
+			}
+
+			archiveBtn.addEventListener("click", function () { setArchiveState(true); });
+			unarchiveBtn.addEventListener("click", function () { setArchiveState(false); });
 			clearBtn.addEventListener("click", clearArchived);
-			render();
+
+			eventRegistrationSelect.addEventListener("change", function () {
+				refreshEventRegistrations();
+			});
+
+			eventRegistrationBody.addEventListener("click", function (event) {
+				var button = event.target.closest("button[data-event-action]");
+				if (!button) {
+					return;
+				}
+
+				var id = button.getAttribute("data-id");
+				if (!id) {
+					return;
+				}
+
+				if (!window.confirm("Delete registration #" + id + "? This cannot be undone.")) {
+					return;
+				}
+
+				window.KUET_API.requestApi(eventRegistrationsApiPath + "/" + encodeURIComponent(id), { method: "DELETE" })
+					.then(function (response) {
+						if (response.status !== 204) {
+							throw new Error("Delete failed.");
+						}
+						refreshEventRegistrations();
+					})
+					.catch(function (error) {
+						eventRegistrationStatus.textContent = "Unable to delete event registration: " + (error && error.message ? error.message : error);
+					});
+			});
+
+			loadEventOptions();
 		})();
 	</script>
 </body>

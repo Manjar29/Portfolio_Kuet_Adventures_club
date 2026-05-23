@@ -23,18 +23,26 @@ public partial class AdminLogin : System.Web.UI.Page
 
         // Read credentials from web.config appSettings if present
         var cfgUser = ConfigurationManager.AppSettings["AdminUser"] ?? "admin";
-        var cfgPass = ConfigurationManager.AppSettings["AdminPass"] ?? "password";
+        var cfgPass = ConfigurationManager.AppSettings["AdminPass"] ?? "admin123";
 
         if (string.Equals(user, cfgUser, StringComparison.Ordinal) && pass == cfgPass)
         {
             Session["IsAdmin"] = true;
 
-            var cookie = new System.Web.HttpCookie("IsAdmin", "1") { HttpOnly = true };
-            if (chkRemember.Checked)
-            {
-                cookie.Expires = DateTime.Now.AddDays(7);
-            }
-            Response.Cookies.Add(cookie);
+                var cookie = new System.Web.HttpCookie("IsAdmin", "1") { HttpOnly = true };
+                if (chkRemember.Checked)
+                {
+                    cookie.Expires = DateTime.Now.AddDays(7);
+                }
+                Response.Cookies.Add(cookie);
+
+                // Also add a non-HttpOnly cookie so static JS pages can detect admin auth
+                var clientCookie = new System.Web.HttpCookie("kuetAdminAuth", "1") { HttpOnly = false };
+                if (chkRemember.Checked)
+                {
+                    clientCookie.Expires = DateTime.Now.AddDays(7);
+                }
+                Response.Cookies.Add(clientCookie);
 
             var returnUrl = Request.QueryString["returnUrl"];
             if (!string.IsNullOrEmpty(returnUrl))

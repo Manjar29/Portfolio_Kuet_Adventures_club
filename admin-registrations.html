@@ -42,6 +42,25 @@
 			margin: 0 0 1rem;
 			font-weight: 500;
 		}
+		.admin-toolbar {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: 1rem;
+			flex-wrap: wrap;
+			margin-bottom: 1rem;
+		}
+		.logout-link {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			padding: 0.7rem 1rem;
+			border-radius: 999px;
+			text-decoration: none;
+			font-weight: 600;
+			background: #102a43;
+			color: #fff;
+		}
 		.row-action {
 			border: 0;
 			border-radius: 999px;
@@ -73,6 +92,10 @@
 
 	<main class="container form-page-wrap">
 		<section class="membership-form form-page-form">
+				<div class="admin-toolbar">
+					<p class="form-status registrations-status" id="authStatus" aria-live="polite">Checking admin access...</p>
+					<a class="logout-link" href="#" id="logoutLink">Logout</a>
+				</div>
 			<p class="form-status registrations-status" id="registrationsStatus" aria-live="polite">Loading registrations...</p>
 			<div class="registrations-table-wrap">
 				<table class="registrations-table" aria-label="Membership registrations">
@@ -87,6 +110,8 @@
 							<th>Mailbox</th>
 							<th>Phone</th>
 							<th>Passport</th>
+							<th>Status</th>
+							<th>Member ID</th>
 							<th>Submitted</th>
 							<th>Actions</th>
 						</tr>
@@ -97,11 +122,41 @@
 		</section>
 	</main>
 
+	<script src="api-client.js?v=20260523c"></script>
+	<script src="copy-protect.js?v=20260523a"></script>
 	<script>
 		(function () {
+			var authStatus = document.getElementById("authStatus");
 			var status = document.getElementById("registrationsStatus");
 			var body = document.getElementById("registrationsBody");
-			var apiUrl = "http://localhost:5000/api/memberships";
+			var logoutLink = document.getElementById("logoutLink");
+			var apiPath = "/api/memberships";
+
+			function getCookie(name) {
+				var match = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "=([^;]*)"));
+				return match ? decodeURIComponent(match[1]) : "";
+			}
+
+			function isAdminAuthenticated() {
+				return sessionStorage.getItem("kuetAdminSession") === "1" || getCookie("kuetAdminAuth") === "1";
+			}
+
+			function clearAuth() {
+				sessionStorage.removeItem("kuetAdminSession");
+				document.cookie = "kuetAdminAuth=; path=/; max-age=0";
+			}
+
+			if (!isAdminAuthenticated()) {
+				window.location.href = "AdminLogin.html?returnUrl=admin-registrations.html";
+				return;
+			}
+
+			authStatus.textContent = "Admin access granted.";
+			logoutLink.addEventListener("click", function (event) {
+				event.preventDefault();
+				clearAuth();
+				window.location.href = "AdminLogin.html";
+			});
 
 			function escapeHtml(value) {
 				return String(value)
@@ -122,19 +177,24 @@
 					"Mailbox: " + row.mailbox,
 					"Phone: " + row.phoneNumber,
 					"Passport: " + (row.hasPassport ? "Yes" : "No"),
+					"Status: " + (row.reviewStatus || "Pending"),
+					"Member ID: " + (row.clubMemberId || "-"),
 					"Submitted: " + (row.submittedAtUtc || ""),
+					"Reviewed: " + (row.reviewedAtUtc || ""),
 					"Message: " + (row.message || "")
 				].join("\n");
 			}
 
 			function loadRows() {
-				fetch(apiUrl)
-					.then(function (response) {
-						if (!response.ok) {
-							throw new Error("Failed to load registrations.");
-						}
-						return response.json();
-					})
+				// Show which API hosts will be tried (helpful when debugging network issues)
+				try {
+					var candidates = window.KUET_API.getApiBaseCandidates();
+					status.textContent = "Attempting: " + (Array.isArray(candidates) ? candidates.join(", ") : candidates);
+				} catch (e) {
+					// ignore if client helper not available
+				}
+
+				window.KUET_API.requestJson(apiPath)
 					.then(function (rows) {
 						if (!Array.isArray(rows) || rows.length === 0) {
 							status.textContent = "No registrations found yet.";
@@ -154,16 +214,19 @@
 								"<td>" + escapeHtml(row.mailbox) + "</td>" +
 								"<td>" + escapeHtml(row.phoneNumber) + "</td>" +
 								"<td>" + (row.hasPassport ? "Yes" : "No") + "</td>" +
+								"<td>" + escapeHtml(row.reviewStatus || "Pending") + "</td>" +
+								"<td>" + escapeHtml(row.clubMemberId || "-") + "</td>" +
 								"<td>" + escapeHtml(row.submittedAtUtc || "") + "</td>" +
 								"<td class='actions-cell'>" +
 									"<button type='button' class='row-action view' data-action='view' data-id='" + escapeHtml(row.id) + "'>View</button>" +
+									"<button type='button' class='row-action accept' data-action='accept' data-id='" + escapeHtml(row.id) + "'>Accept</button>" +
 									"<button type='button' class='row-action delete' data-action='delete' data-id='" + escapeHtml(row.id) + "'>Delete</button>" +
 								"</td>" +
 								"</tr>";
 						}).join("");
 					})
 					.catch(function (error) {
-						status.textContent = "Unable to load registrations: " + error.message;
+						status.textContent = "Unable to load registrations: " + (error && error.message ? error.message : error);
 						body.innerHTML = "";
 					});
 			}
@@ -177,22 +240,41 @@
 				var id = button.getAttribute("data-id");
 				var action = button.getAttribute("data-action");
 				var row = button.closest("tr");
-				var cells = row ? row.querySelectorAll("td") : [];
 
 				if (action === "view") {
-						fetch(apiUrl + "/" + encodeURIComponent(id))
-							.then(function (response) {
-								if (!response.ok) {
-									throw new Error("Failed to load registration details.");
-								}
-								return response.json();
-							})
-							.then(function (data) {
-								window.alert(getRowDetails(data));
-							})
-							.catch(function (error) {
-								status.textContent = "Unable to load registration details: " + error.message;
-							});
+					window.KUET_API.requestJson(apiPath + "/" + encodeURIComponent(id))
+						.then(function (data) {
+							window.alert(getRowDetails(data));
+						})
+						.catch(function (error) {
+							status.textContent = "Unable to load registration details: " + error.message;
+						});
+					return;
+				}
+
+				if (action === "accept") {
+					var suggestedId = "KAC-" + String(id).padStart(4, "0");
+					var clubMemberId = window.prompt("Enter club member ID to assign, or leave blank for auto-generate:", suggestedId);
+					if (clubMemberId === null) {
+						return;
+					}
+
+					window.KUET_API.requestApi(apiPath + "/" + encodeURIComponent(id) + "/accept", {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json"
+						},
+						body: JSON.stringify({ clubMemberId: clubMemberId.trim() })
+					})
+						.then(function (response) {
+							if (response.status !== 200) {
+								throw new Error("Accept failed.");
+							}
+							loadRows();
+						})
+						.catch(function (error) {
+							status.textContent = "Unable to accept registration: " + (error && error.message ? error.message : error);
+						});
 					return;
 				}
 
@@ -201,7 +283,7 @@
 						return;
 					}
 
-					fetch(apiUrl + "/" + encodeURIComponent(id), { method: "DELETE" })
+					window.KUET_API.requestApi(apiPath + "/" + encodeURIComponent(id), { method: "DELETE" })
 						.then(function (response) {
 							if (response.status !== 204) {
 								throw new Error("Delete failed.");

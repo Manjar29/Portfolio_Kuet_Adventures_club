@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Event Manager - KUET Adventure Club</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="p29.css">
+	<style>
+		.manager-grid {
+			display: grid;
+			gap: 1rem;
+		}
+		.manager-form {
+			display: grid;
+			gap: 0.85rem;
+		}
+		.manager-form textarea,
+		.manager-form input,
+		.manager-form select {
+			width: 100%;
+			padding: 0.8rem 0.9rem;
+			border-radius: 12px;
+			border: 1px solid rgba(15, 23, 42, 0.16);
+			font: inherit;
+		}
+		.manager-actions {
+			display: flex;
+			gap: 0.6rem;
+			flex-wrap: wrap;
+		}
+		.manager-table-wrap {
+			overflow-x: auto;
+		}
+		.manager-table {
+			width: 100%;
+			border-collapse: collapse;
+			margin-top: 0.75rem;
+		}
+		.manager-table th,
+		.manager-table td {
+			padding: 0.65rem 0.75rem;
+			border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+			text-align: left;
+			vertical-align: top;
+		}
+		.manager-table th {
+			background: rgba(16, 42, 67, 0.92);
+			color: #fff;
+		}
+		.event-name.archived {
+			color: #991b1b;
+			text-decoration: line-through;
+			text-decoration-thickness: 2px;
+		}
+		.row-actions {
+			display: flex;
+			gap: 0.35rem;
+			flex-wrap: wrap;
+		}
+		.row-action {
+			border: 0;
+			border-radius: 999px;
+			padding: 0.45rem 0.78rem;
+			font: inherit;
+			font-weight: 600;
+			cursor: pointer;
+		}
+		.row-action.edit { background: #dbeafe; color: #1d4ed8; }
+		.row-action.archive { background: #fee2e2; color: #991b1b; }
+		.row-action.unarchive { background: #dcfce7; color: #166534; }
+		.row-action.delete { background: #fecaca; color: #7f1d1d; }
+		.row-action.register { background: #fef3c7; color: #92400e; text-decoration: none; display: inline-flex; align-items: center; }
+	</style>
+</head>
+<body class="membership-page">
+	<header class="page-hero">
+		<div class="container page-hero-inner">
+			<a href="admin.html" class="back-link">Back to admin panel</a>
+			<p class="eyebrow">Admin</p>
+			<h1>Event Manager</h1>
+			<p>Create events, update details, upload a photo, archive expired events, or delete permanently.</p>
+		</div>
+	</header>
+
+	<main class="container form-page-wrap">
+		<section class="event-detail-card manager-grid">
+			<div class="card">
+				<h3 id="managerFormTitle">Add New Event</h3>
+				<form id="eventManagerForm" class="manager-form">
+					<input type="hidden" id="eventId">
+					<div class="form-row">
+						<label for="eventName">Event Name</label>
+						<input id="eventName" required>
+					</div>
+					<div class="form-row">
+						<label for="eventTitle">Title</label>
+						<input id="eventTitle" required>
+					</div>
+					<div class="form-row">
+						<label for="eventShortDescription">Short Description</label>
+						<textarea id="eventShortDescription" rows="2" required></textarea>
+					</div>
+					<div class="form-row">
+						<label for="eventSubtitle">Subtitle</label>
+						<textarea id="eventSubtitle" rows="2" required></textarea>
+					</div>
+					<div class="form-row">
+						<label for="eventOverview">Overview</label>
+						<textarea id="eventOverview" rows="3" required></textarea>
+					</div>
+					<div class="form-row">
+						<label for="eventDateUtc">Event Date</label>
+						<input id="eventDateUtc" type="datetime-local">
+					</div>
+					<div class="form-row">
+						<label for="eventDeadlineUtc">Registration Deadline</label>
+						<input id="eventDeadlineUtc" type="datetime-local">
+					</div>
+					<div class="form-row">
+						<label for="eventImageSrc">Photo URL / Path</label>
+						<input id="eventImageSrc" placeholder="example: event-photo.webp or https://...">
+					</div>
+					<div class="form-row">
+						<label for="eventImageFile">Or Upload Photo</label>
+						<input id="eventImageFile" type="file" accept="image/*">
+					</div>
+					<div class="form-row">
+						<label for="eventImageAlt">Photo Alt Text</label>
+						<input id="eventImageAlt">
+					</div>
+					<div class="form-row">
+						<label for="eventSchedule">Schedule (one line per item)</label>
+						<textarea id="eventSchedule" rows="4"></textarea>
+					</div>
+					<div class="form-row">
+						<label for="eventRequirements">Requirements (one line per item)</label>
+						<textarea id="eventRequirements" rows="4"></textarea>
+					</div>
+					<div class="form-row">
+						<label for="eventPayment">Payment (one line per item)</label>
+						<textarea id="eventPayment" rows="4"></textarea>
+					</div>
+					<div class="form-row">
+						<label><input id="eventArchived" type="checkbox"> Mark as archived</label>
+					</div>
+					<div class="manager-actions">
+						<button type="submit" class="btn btn-primary" id="saveEventBtn">Save Event</button>
+						<button type="button" class="btn btn-ghost" id="resetEventBtn">Reset Form</button>
+					</div>
+					<p class="form-status" id="managerStatus" aria-live="polite"></p>
+				</form>
+			</div>
+
+			<div class="card">
+				<h3>Existing Events</h3>
+				<p>Expired events are shown with red strike-through. Archive means closed. Delete removes permanently.</p>
+				<div class="manager-table-wrap">
+					<table class="manager-table" aria-label="Event manager table">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>Date</th>
+								<th>Deadline</th>
+								<th>Status</th>
+								<th>Actions</th>
+							</tr>
+						</thead>
+						<tbody id="eventManagerBody"></tbody>
+					</table>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<script src="copy-protect.js?v=20260523a"></script>
+	<script src="api-client.js?v=20260523c"></script>
+	<script>
+		(function () {
+			var eventsApiPath = "/api/events/catalog";
+			var form = document.getElementById("eventManagerForm");
+			var formTitle = document.getElementById("managerFormTitle");
+			var status = document.getElementById("managerStatus");
+			var body = document.getElementById("eventManagerBody");
+			var resetBtn = document.getElementById("resetEventBtn");
+			var imageFile = document.getElementById("eventImageFile");
+			var idInput = document.getElementById("eventId");
+			var nameInput = document.getElementById("eventName");
+			var titleInput = document.getElementById("eventTitle");
+			var shortInput = document.getElementById("eventShortDescription");
+			var subtitleInput = document.getElementById("eventSubtitle");
+			var overviewInput = document.getElementById("eventOverview");
+			var dateInput = document.getElementById("eventDateUtc");
+			var deadlineInput = document.getElementById("eventDeadlineUtc");
+			var imageSrcInput = document.getElementById("eventImageSrc");
+			var imageAltInput = document.getElementById("eventImageAlt");
+			var scheduleInput = document.getElementById("eventSchedule");
+			var requirementsInput = document.getElementById("eventRequirements");
+			var paymentInput = document.getElementById("eventPayment");
+			var archivedInput = document.getElementById("eventArchived");
+
+			function splitLines(value) {
+				return String(value || "").split(/\r?\n/).map(function (line) {
+					return line.trim();
+				}).filter(function (line) {
+					return !!line;
+				});
+			}
+
+			function toDateInputValue(value) {
+				if (!value) {
+					return "";
+				}
+				var date = new Date(value);
+				if (isNaN(date.getTime())) {
+					return "";
+				}
+				var year = date.getUTCFullYear();
+				var month = String(date.getUTCMonth() + 1).padStart(2, "0");
+				var day = String(date.getUTCDate()).padStart(2, "0");
+				var hours = String(date.getUTCHours()).padStart(2, "0");
+				var minutes = String(date.getUTCMinutes()).padStart(2, "0");
+				return year + "-" + month + "-" + day + "T" + hours + ":" + minutes;
+			}
+
+			function fromDateInputValue(value) {
+				if (!value) {
+					return null;
+				}
+				return new Date(value).toISOString();
+			}
+
+			function escapeHtml(value) {
+				return String(value)
+					.replace(/&/g, "&amp;")
+					.replace(/</g, "&lt;")
+					.replace(/>/g, "&gt;")
+					.replace(/\"/g, "&quot;")
+					.replace(/'/g, "&#39;");
+			}
+
+			function setStatus(message, isError) {
+				status.textContent = message;
+				status.style.color = isError ? "#991b1b" : "#166534";
+			}
+
+			function resetForm() {
+				form.reset();
+				idInput.value = "";
+				formTitle.textContent = "Add New Event";
+			}
+
+			function buildPayload() {
+				return {
+					eventName: nameInput.value.trim(),
+					title: titleInput.value.trim(),
+					shortDescription: shortInput.value.trim(),
+					subtitle: subtitleInput.value.trim(),
+					overview: overviewInput.value.trim(),
+					eventDateUtc: fromDateInputValue(dateInput.value),
+					deadlineUtc: fromDateInputValue(deadlineInput.value),
+					imageSrc: imageSrcInput.value.trim() || null,
+					imageAlt: imageAltInput.value.trim() || null,
+					schedule: splitLines(scheduleInput.value),
+					requirements: splitLines(requirementsInput.value),
+					payment: splitLines(paymentInput.value),
+					isArchived: archivedInput.checked
+				};
+			}
+
+			function fillForm(item) {
+				idInput.value = item.id;
+				nameInput.value = item.eventName || "";
+				titleInput.value = item.title || "";
+				shortInput.value = item.shortDescription || "";
+				subtitleInput.value = item.subtitle || "";
+				overviewInput.value = item.overview || "";
+				dateInput.value = toDateInputValue(item.eventDateUtc);
+				deadlineInput.value = toDateInputValue(item.deadlineUtc);
+				imageSrcInput.value = item.imageSrc || "";
+				imageAltInput.value = item.imageAlt || "";
+				scheduleInput.value = Array.isArray(item.schedule) ? item.schedule.join("\n") : "";
+				requirementsInput.value = Array.isArray(item.requirements) ? item.requirements.join("\n") : "";
+				paymentInput.value = Array.isArray(item.payment) ? item.payment.join("\n") : "";
+				archivedInput.checked = !!item.isArchived;
+				formTitle.textContent = "Update Event";
+			}
+
+			function formatDate(value) {
+				if (!value) {
+					return "-";
+				}
+				var parsed = new Date(value);
+				if (isNaN(parsed.getTime())) {
+					return "-";
+				}
+				return parsed.toLocaleString();
+			}
+
+			function loadEvents() {
+				setStatus("Loading events...", false);
+				return window.KUET_API.requestJson(eventsApiPath + "?includeArchived=true")
+					.then(function (events) {
+						if (!Array.isArray(events) || events.length === 0) {
+							body.innerHTML = "<tr><td colspan='5'>No events found.</td></tr>";
+							setStatus("No events yet. Add your first event.", false);
+							return;
+						}
+
+						body.innerHTML = events.map(function (item) {
+							var statusText = item.isExpired ? "Expired (archived)" : (item.isArchived ? "Archived" : "Active");
+							var nameClass = item.isArchived ? "event-name archived" : "event-name";
+							var archiveAction = "<button type='button' class='row-action " + (item.isArchived ? "unarchive" : "archive") + "' data-action='" + (item.isArchived ? "unarchive" : "archive") + "' data-id='" + item.id + "'>" + (item.isArchived ? "Unarchive" : "Archive") + "</button>";
+							if (item.isExpired) {
+								archiveAction = "<button type='button' class='row-action unarchive' disabled title='Expired events remain archived'>Expired</button>";
+							}
+							return "<tr>" +
+								"<td><span class='" + nameClass + "'>" + escapeHtml(item.eventName) + "</span></td>" +
+								"<td>" + escapeHtml(formatDate(item.eventDateUtc)) + "</td>" +
+								"<td>" + escapeHtml(formatDate(item.deadlineUtc)) + "</td>" +
+								"<td>" + escapeHtml(statusText) + "</td>" +
+								"<td><div class='row-actions'>" +
+									"<button type='button' class='row-action edit' data-action='edit' data-id='" + item.id + "'>Edit</button>" +
+									archiveAction +
+									"<a class='row-action register' href='register.html?event=" + encodeURIComponent(item.eventName) + "'>Event Register</a>" +
+									"<button type='button' class='row-action delete' data-action='delete' data-id='" + item.id + "'>Delete</button>" +
+								"</div></td>" +
+							"</tr>";
+						}).join("");
+						setStatus("Loaded " + events.length + " event(s).", false);
+					});
+			}
+
+			form.addEventListener("submit", function (event) {
+				event.preventDefault();
+				var payload = buildPayload();
+				if (!payload.eventName || !payload.title || !payload.subtitle || !payload.overview || !payload.shortDescription) {
+					setStatus("Please fill in all required fields.", true);
+					return;
+				}
+
+				var id = idInput.value;
+				var path = id ? eventsApiPath + "/" + encodeURIComponent(id) : eventsApiPath;
+				var method = id ? "PUT" : "POST";
+				setStatus("Saving event...", false);
+
+				window.KUET_API.requestApi(path, {
+					method: method,
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(payload)
+				})
+					.then(function (response) {
+						if (!response.ok) {
+							throw new Error("Save failed (status " + response.status + ").");
+						}
+						setStatus("Event saved successfully.", false);
+						resetForm();
+						return loadEvents();
+					})
+					.catch(function (error) {
+						setStatus(error && error.message ? error.message : "Unable to save event.", true);
+					});
+			});
+
+			resetBtn.addEventListener("click", function () {
+				resetForm();
+				setStatus("Form reset.", false);
+			});
+
+			imageFile.addEventListener("change", function () {
+				if (!imageFile.files || !imageFile.files[0]) {
+					return;
+				}
+				var reader = new FileReader();
+				reader.onload = function () {
+					imageSrcInput.value = String(reader.result || "");
+				};
+				reader.readAsDataURL(imageFile.files[0]);
+			});
+
+			body.addEventListener("click", function (event) {
+				var button = event.target.closest("button[data-action]");
+				if (!button) {
+					return;
+				}
+
+				var id = button.getAttribute("data-id");
+				var action = button.getAttribute("data-action");
+				if (!id || !action) {
+					return;
+				}
+
+				if (action === "edit") {
+					window.KUET_API.requestJson(eventsApiPath + "/" + encodeURIComponent(id))
+						.then(function (item) {
+							fillForm(item);
+							setStatus("Editing event: " + item.eventName, false);
+						})
+						.catch(function (error) {
+							setStatus("Unable to load event: " + (error && error.message ? error.message : error), true);
+						});
+					return;
+				}
+
+				if (action === "delete") {
+					if (!window.confirm("Delete this event permanently?")) {
+						return;
+					}
+					window.KUET_API.requestApi(eventsApiPath + "/" + encodeURIComponent(id), { method: "DELETE" })
+						.then(function (response) {
+							if (response.status !== 204) {
+								throw new Error("Delete failed.");
+							}
+							setStatus("Event deleted permanently.", false);
+							if (String(idInput.value) === String(id)) {
+								resetForm();
+							}
+							return loadEvents();
+						})
+						.catch(function (error) {
+							setStatus("Unable to delete event: " + (error && error.message ? error.message : error), true);
+						});
+					return;
+				}
+
+				if (action === "archive" || action === "unarchive") {
+					var method = action === "archive" ? "POST" : "DELETE";
+					window.KUET_API.requestApi(eventsApiPath + "/" + encodeURIComponent(id) + "/archive", { method: method })
+						.then(function (response) {
+							if (response.status !== 204) {
+								throw new Error((action === "archive" ? "Archive" : "Unarchive") + " failed.");
+							}
+							setStatus(action === "archive" ? "Event archived." : "Event unarchived.", false);
+							return loadEvents();
+						})
+						.catch(function (error) {
+							setStatus("Unable to update archive state: " + (error && error.message ? error.message : error), true);
+						});
+				}
+			});
+
+			loadEvents();
+		})();
+	</script>
+</body>
+</html>

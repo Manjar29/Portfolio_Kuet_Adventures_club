@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Registration Details - KUET Adventure Club</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="p29.css">
+	<style>
+		.detail-shell {
+			max-width: 920px;
+			margin: 0 auto;
+		}
+		.detail-card {
+			background: rgba(255, 255, 255, 0.95);
+			border-radius: 26px;
+			padding: 1.6rem;
+			box-shadow: 0 24px 70px rgba(15, 23, 42, 0.12);
+		}
+		.detail-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+			gap: 1rem;
+			margin-top: 1rem;
+		}
+		.detail-item {
+			background: rgba(15, 23, 42, 0.04);
+			border-radius: 16px;
+			padding: 0.95rem 1rem;
+		}
+		.detail-item label {
+			display: block;
+			font-size: 0.85rem;
+			text-transform: uppercase;
+			letter-spacing: 0.08em;
+			color: rgba(15, 23, 42, 0.62);
+			margin-bottom: 0.4rem;
+		}
+		.detail-item strong {
+			font-size: 1.02rem;
+			word-break: break-word;
+		}
+		.detail-actions {
+			display: flex;
+			gap: 0.75rem;
+			flex-wrap: wrap;
+			margin-top: 1.25rem;
+		}
+		.status-line {
+			margin-top: 0.9rem;
+			font-weight: 500;
+		}
+	</style>
+</head>
+<body class="membership-page">
+	<header class="page-hero">
+		<div class="container page-hero-inner">
+			<a href="admin.html" class="back-link">Back to admin panel</a>
+			<p class="eyebrow">Admin</p>
+			<h1>Registration Details</h1>
+			<p>View a single event registration and cancel it if needed.</p>
+		</div>
+	</header>
+
+	<main class="container form-page-wrap detail-shell">
+		<section class="detail-card">
+			<p class="form-status" id="registrationStatus" aria-live="polite">Loading registration...</p>
+			<h2 id="registrationTitle">Registration #</h2>
+			<div class="detail-grid" id="registrationDetails"></div>
+			<div class="detail-actions">
+				<button type="button" class="btn btn-primary" id="deleteRegistrationBtn">Delete Registration</button>
+				<a href="admin.html" class="btn btn-ghost">Back to dashboard</a>
+			</div>
+			<p class="status-line" id="registrationActionStatus" aria-live="polite"></p>
+		</section>
+	</main>
+
+	<script src="api-client.js?v=20260523c"></script>
+	<script src="copy-protect.js?v=20260523a"></script>
+	<script>
+		(function () {
+			var params = new URLSearchParams(window.location.search);
+			var id = params.get("id");
+			var title = document.getElementById("registrationTitle");
+			var status = document.getElementById("registrationStatus");
+			var details = document.getElementById("registrationDetails");
+			var actionStatus = document.getElementById("registrationActionStatus");
+			var deleteBtn = document.getElementById("deleteRegistrationBtn");
+			var apiPath = "/api/event-registrations";
+
+			if (!id) {
+				status.textContent = "Missing registration id.";
+				deleteBtn.disabled = true;
+				return;
+			}
+
+			function escapeHtml(value) {
+				return String(value)
+					.replace(/&/g, "&amp;")
+					.replace(/</g, "&lt;")
+					.replace(/>/g, "&gt;")
+					.replace(/\"/g, "&quot;")
+					.replace(/'/g, "&#39;");
+			}
+
+			function renderRecord(row) {
+				title.textContent = "Registration #" + row.id;
+				status.textContent = row.eventName ? (row.eventName + " registration loaded.") : "Registration loaded.";
+
+				details.innerHTML = [
+					["Event", row.eventName],
+					["Name", row.fullName],
+					["Department", row.department],
+					["Club ID", row.clubId],
+					["Roll", row.roll],
+					["Transaction ID", row.transactionId],
+					["Submitted", row.submittedAtUtc]
+				].map(function (pair) {
+					return "<div class='detail-item'><label>" + escapeHtml(pair[0]) + "</label><strong>" + escapeHtml(pair[1] || "-") + "</strong></div>";
+				}).join("");
+			}
+
+			window.KUET_API.requestJson(apiPath + "/" + encodeURIComponent(id))
+				.then(function (row) {
+					renderRecord(row);
+				})
+				.catch(function (error) {
+					status.textContent = "Unable to load registration: " + (error && error.message ? error.message : error);
+					deleteBtn.disabled = true;
+				});
+
+			deleteBtn.addEventListener("click", function () {
+				if (!window.confirm("Delete registration #" + id + "? This cannot be undone.")) {
+					return;
+				}
+
+				actionStatus.textContent = "Deleting...";
+				window.KUET_API.requestApi(apiPath + "/" + encodeURIComponent(id), { method: "DELETE" })
+					.then(function (response) {
+						if (response.status !== 204) {
+							throw new Error("Delete failed.");
+						}
+						actionStatus.textContent = "Registration deleted.";
+						deleteBtn.disabled = true;
+						setTimeout(function () {
+							window.location.href = "admin.html";
+						}, 700);
+					})
+					.catch(function (error) {
+						actionStatus.textContent = "Unable to delete registration: " + (error && error.message ? error.message : error);
+					});
+			});
+		})();
+	</script>
+</body>
+</html>

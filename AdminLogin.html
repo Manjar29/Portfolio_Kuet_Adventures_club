@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Admin Login - KUET Adventure Club</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="p29.css">
+	<style>
+		.login-shell {
+			max-width: 480px;
+			margin: 0 auto;
+		}
+		.login-card {
+			background: rgba(255, 255, 255, 0.94);
+			border-radius: 24px;
+			padding: 2rem;
+			box-shadow: 0 24px 70px rgba(15, 23, 42, 0.12);
+		}
+		.login-form {
+			display: grid;
+			gap: 1rem;
+		}
+		.login-form label {
+			font-weight: 600;
+		}
+		.login-form input[type="text"],
+		.login-form input[type="password"] {
+			width: 100%;
+			padding: 0.85rem 1rem;
+			border: 1px solid rgba(15, 23, 42, 0.16);
+			border-radius: 14px;
+			font: inherit;
+		}
+		.login-options {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: 1rem;
+			flex-wrap: wrap;
+		}
+		.login-status {
+			min-height: 1.4rem;
+			font-weight: 500;
+			color: #b91c1c;
+		}
+	</style>
+</head>
+<body class="membership-page">
+	<header class="page-hero">
+		<div class="container page-hero-inner">
+			<a href="admin.html" class="back-link">Back to admin panel</a>
+			<p class="eyebrow">Admin</p>
+			<h1>Admin Login</h1>
+			<p>Use this gate to access registration management.</p>
+		</div>
+	</header>
+
+	<main class="container form-page-wrap">
+		<section class="login-shell">
+			<div class="login-card">
+				<form id="adminLoginForm" class="login-form">
+					<div>
+						<label for="adminUser">Username</label>
+						<input id="adminUser" name="adminUser" type="text" autocomplete="username" required>
+					</div>
+					<div>
+						<label for="adminPass">Password</label>
+						<input id="adminPass" name="adminPass" type="password" autocomplete="current-password" required>
+					</div>
+					<div class="login-options">
+						<label><input id="rememberAdmin" type="checkbox"> Remember me</label>
+						<span class="login-status" id="loginStatus" aria-live="polite"></span>
+					</div>
+					<button type="submit" class="btn btn-primary">Sign in</button>
+				</form>
+			</div>
+		</section>
+	</main>
+
+	<script>
+		(function () {
+			var form = document.getElementById("adminLoginForm");
+			var userInput = document.getElementById("adminUser");
+			var passInput = document.getElementById("adminPass");
+			var rememberInput = document.getElementById("rememberAdmin");
+			var status = document.getElementById("loginStatus");
+			var params = new URLSearchParams(window.location.search);
+			var returnUrl = params.get("returnUrl") || "admin-registrations.html";
+
+			function setCookie(name, value, maxAgeSeconds) {
+				var cookie = name + "=" + encodeURIComponent(value) + "; path=/";
+				if (typeof maxAgeSeconds === "number") {
+					cookie += "; max-age=" + maxAgeSeconds;
+				}
+				document.cookie = cookie;
+			}
+
+			form.addEventListener("submit", function (event) {
+				event.preventDefault();
+
+				var user = userInput.value.trim();
+				var pass = passInput.value;
+
+				if (user === "admin" && pass === "admin123") {
+					sessionStorage.setItem("kuetAdminSession", "1");
+					if (rememberInput.checked) {
+						setCookie("kuetAdminAuth", "1", 60 * 60 * 24 * 7);
+					} else {
+						setCookie("kuetAdminAuth", "1");
+					}
+					window.location.href = returnUrl;
+					return;
+				}
+
+				status.textContent = "Invalid admin credentials.";
+			});
+		})();
+	</script>
+	<script src="copy-protect.js?v=20260523a"></script>
+</body>
+</html>

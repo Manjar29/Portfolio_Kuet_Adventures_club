@@ -15,6 +15,10 @@
 	margin: 0;
 	padding: 0;
 	box-sizing: border-box;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 
 html {
@@ -246,7 +250,31 @@ body {
 }
 
 .event-item.is-archived {
-	display: none;
+	border: 1px solid rgba(185, 28, 28, 0.28);
+	background: #fff5f5;
+}
+
+.event-item.is-archived h3 {
+	color: #991b1b;
+	text-decoration: line-through;
+	text-decoration-thickness: 2px;
+}
+
+.event-item.is-archived .event-date {
+	background: #fee2e2;
+	color: #991b1b;
+}
+
+.event-archived-note {
+	margin-top: 0.5rem;
+	color: #991b1b;
+	font-weight: 700;
+}
+
+.events-status {
+	margin-top: 0.8rem;
+	font-weight: 600;
+	color: var(--muted);
 }
 
 .section-heading h2 {

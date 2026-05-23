@@ -99,6 +99,7 @@
   <ItemGroup>
     <None Include="index.html" />
     <None Include="admin.html" />
+    <None Include="AdminLogin.html" />
     <None Include="event.html" />
     <None Include="membership.html" />
     <None Include="register.html" />

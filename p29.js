@@ -1,22 +1,17 @@
 
 document.addEventListener("DOMContentLoaded", function () {
-	setupArchivedEvents();
+	setupEventsList();
 	setupMembershipForm();
 	setupEventRegistrationForm();
 	setupEventDetailsPage();
 });
 
-var apiBaseUrl = "http://localhost:5000";
-var archiveApiUrl = apiBaseUrl + "/api/events/archived";
+var archiveApiPath = "/api/events/archived";
+var eventDetailsApiPath = "/api/events/details";
+var eventsApiPath = "/api/events";
 
 function getArchivedEvents() {
-	return fetch(archiveApiUrl)
-		.then(function (response) {
-			if (!response.ok) {
-				throw new Error("Failed to load archived events.");
-			}
-			return response.json();
-		})
+	return window.KUET_API.requestJson(archiveApiPath)
 		.then(function (archived) {
 			return Array.isArray(archived) ? archived : [];
 		})
@@ -31,16 +26,166 @@ function isArchivedEvent(eventName) {
 	});
 }
 
-function setupArchivedEvents() {
-	getArchivedEvents().then(function (archivedEvents) {
-		var cards = document.querySelectorAll(".event-item[data-event-name]");
+function getEventDetailsOverride(eventName) {
+	return window.KUET_API.requestJson(eventDetailsApiPath + "/" + encodeURIComponent(eventName))
+		.catch(function () {
+			return null;
+		});
+}
 
-		for (var i = 0; i < cards.length; i++) {
-			var card = cards[i];
-			var eventName = card.getAttribute("data-event-name");
-			card.classList.toggle("is-archived", archivedEvents.indexOf(eventName) !== -1);
-		}
+function cloneList(values) {
+	return Array.isArray(values) ? values.slice() : [];
+}
+
+function mergeEventDetails(baseDetails, overrideDetails, eventName) {
+	var merged = {
+		title: eventName,
+		subtitle: baseDetails.subtitle,
+		overview: baseDetails.overview,
+		image: baseDetails.image ? {
+			src: baseDetails.image.src,
+			alt: baseDetails.image.alt
+		} : null,
+		schedule: cloneList(baseDetails.schedule),
+		requirements: cloneList(baseDetails.requirements),
+		payment: cloneList(baseDetails.payment)
+	};
+
+	if (!overrideDetails) {
+		return merged;
+	}
+
+	if (overrideDetails.title) {
+		merged.title = overrideDetails.title;
+	}
+	if (overrideDetails.subtitle) {
+		merged.subtitle = overrideDetails.subtitle;
+	}
+	if (overrideDetails.overview) {
+		merged.overview = overrideDetails.overview;
+	}
+	if (overrideDetails.imageSrc || overrideDetails.imageAlt) {
+		merged.image = {
+			src: overrideDetails.imageSrc || (baseDetails.image ? baseDetails.image.src : ""),
+			alt: overrideDetails.imageAlt || (baseDetails.image ? baseDetails.image.alt : "")
+		};
+	}
+	if (Array.isArray(overrideDetails.schedule) && overrideDetails.schedule.length) {
+		merged.schedule = cloneList(overrideDetails.schedule);
+	}
+	if (Array.isArray(overrideDetails.requirements) && overrideDetails.requirements.length) {
+		merged.requirements = cloneList(overrideDetails.requirements);
+	}
+	if (Array.isArray(overrideDetails.payment) && overrideDetails.payment.length) {
+		merged.payment = cloneList(overrideDetails.payment);
+	}
+
+	return merged;
+}
+
+function setupArchivedEvents() {
+	setupEventsList();
+}
+
+function formatEventDate(value) {
+	if (!value) {
+		return "Date will be announced";
+	}
+
+	var parsed = new Date(value);
+	if (isNaN(parsed.getTime())) {
+		return "Date will be announced";
+	}
+
+	return parsed.toLocaleDateString("en-US", {
+		month: "long",
+		day: "2-digit",
+		year: "numeric"
 	});
+}
+
+function setupEventsList() {
+	var eventList = document.getElementById("eventList");
+	var status = document.getElementById("eventsStatus");
+
+	if (!eventList) {
+		return;
+	}
+
+	if (status) {
+		status.textContent = "Loading events...";
+	}
+
+	window.KUET_API.requestJson(eventsApiPath + "?includeArchived=true")
+		.then(function (events) {
+			if (!Array.isArray(events) || events.length === 0) {
+				eventList.innerHTML = "";
+				if (status) {
+					status.textContent = "No events available right now.";
+				}
+				return;
+			}
+
+			eventList.innerHTML = "";
+			for (var i = 0; i < events.length; i++) {
+				var item = events[i];
+				var card = document.createElement("article");
+				card.className = "event-item" + (item.isArchived ? " is-archived" : "");
+				card.setAttribute("data-event-name", item.eventName);
+
+				var date = document.createElement("p");
+				date.className = "event-date";
+				date.textContent = formatEventDate(item.eventDateUtc);
+
+				var heading = document.createElement("h3");
+				heading.textContent = item.title || item.eventName;
+
+				var description = document.createElement("p");
+				description.textContent = item.shortDescription || item.overview || "Event details are available on the event page.";
+
+				var actions = document.createElement("div");
+				actions.className = "event-actions";
+
+				var viewLink = document.createElement("a");
+				viewLink.className = "btn event-view-btn";
+				viewLink.href = "event.html?event=" + encodeURIComponent(item.eventName);
+				viewLink.textContent = "View Event";
+
+				var registerLink = document.createElement("a");
+				registerLink.className = "btn btn-primary event-register-btn";
+				registerLink.textContent = item.isArchived ? "Archived" : "Register";
+				registerLink.href = item.isArchived ? "#" : "register.html?event=" + encodeURIComponent(item.eventName);
+				registerLink.classList.toggle("is-disabled", !!item.isArchived);
+				registerLink.setAttribute("aria-disabled", item.isArchived ? "true" : "false");
+
+				actions.appendChild(viewLink);
+				actions.appendChild(registerLink);
+
+				card.appendChild(date);
+				card.appendChild(heading);
+				card.appendChild(description);
+				card.appendChild(actions);
+
+				if (item.isArchived) {
+					var archivedNote = document.createElement("p");
+					archivedNote.className = "event-archived-note";
+					archivedNote.textContent = item.isExpired ? "Expired: registration deadline has passed." : "Archived by admin.";
+					card.appendChild(archivedNote);
+				}
+
+				eventList.appendChild(card);
+			}
+
+			if (status) {
+				status.textContent = "";
+			}
+		})
+		.catch(function (error) {
+			eventList.innerHTML = "";
+			if (status) {
+				status.textContent = "Unable to load events: " + (error && error.message ? error.message : error);
+			}
+		});
 }
 
 function setupMembershipForm() {
@@ -103,8 +248,7 @@ function setupMembershipForm() {
 			message: message.value.trim()
 		};
 
-		var apiUrl = "http://localhost:5000/api/memberships";
-		fetch(apiUrl, {
+		window.KUET_API.requestApi("/api/memberships", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json"
@@ -112,13 +256,38 @@ function setupMembershipForm() {
 			body: JSON.stringify(payload)
 		})
 			.then(function (response) {
-				if (!response.ok) {
-					throw new Error("Failed to submit membership application.");
+				if (response.ok) {
+					window.location.href = "success.html";
+					return;
 				}
-				window.location.href = "success.html";
+
+				// Try to read error details from the response body
+				return response.text().then(function (text) {
+					var message = "Submit failed (status " + response.status + ")";
+					try {
+						var json = JSON.parse(text || "{}");
+						if (json && json.title) {
+							message = json.title + (json.detail ? (": " + json.detail) : "");
+						} else if (json && json.errors) {
+							// ValidationProblem format
+							var all = [];
+							Object.keys(json.errors).forEach(function (k) {
+								all.push(k + ": " + json.errors[k].join(", "));
+							});
+							if (all.length) message = all.join("; ");
+						} else if (json && json.message) {
+							message = json.message;
+						}
+					} catch (e) {
+						// ignore parse errors
+					}
+
+					status.textContent = message;
+					status.style.color = "#9a3412";
+				});
 			})
-			.catch(function () {
-				status.textContent = "Could not connect to ASP.NET API. Start backend and try again.";
+			.catch(function (err) {
+				status.textContent = "Could not connect to the ASP.NET API: " + (err && err.message ? err.message : err);
 				status.style.color = "#9a3412";
 			});
 	});
@@ -172,7 +341,33 @@ function setupEventRegistrationForm() {
 			return;
 		}
 
-		window.location.href = "register-success.html";
+		var payload = {
+			eventName: eventName,
+			fullName: name.value.trim(),
+			department: department.value.trim(),
+			clubId: clubId.value.trim(),
+			roll: roll.value.trim(),
+			transactionId: transaction.value.trim()
+		};
+
+		window.KUET_API.requestApi("/api/event-registrations", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify(payload)
+		})
+			.then(function (response) {
+				if (!response.ok && response.status !== 201) {
+					throw new Error("Submit failed (status " + response.status + ").");
+				}
+
+				window.location.href = "register-success.html?event=" + encodeURIComponent(eventName);
+			})
+			.catch(function (err) {
+				status.textContent = "Could not connect to the ASP.NET API: " + (err && err.message ? err.message : err);
+				status.style.color = "#9a3412";
+			});
 	});
 }
 
@@ -282,56 +477,66 @@ function setupEventDetailsPage() {
 	};
 
 	var details = eventData[eventName] || {
+		title: eventName,
 		subtitle: "Event details, schedule, requirements, and payment instructions are available below.",
 		overview: "Please review each section carefully before registering.",
 		schedule: ["Schedule will be announced by the organizing team."],
 		requirements: ["Basic participant requirements will be shared by email."],
 		payment: ["bKash number: 01700-000000", "Bank account number: 123456789000", "Follow transaction format: bk + last 4 digits."]
 	};
-	title.textContent = eventName;
-	getArchivedEvents().then(function (archivedEvents) {
-		var archived = archivedEvents.indexOf(eventName) !== -1;
 
-		subtitle.textContent = archived ? details.subtitle + " This event is archived and registrations are closed." : details.subtitle;
-		overview.textContent = details.overview;
+	function applyDetailsToView(resolvedDetails, archived) {
+		title.textContent = resolvedDetails.title;
+		subtitle.textContent = archived ? resolvedDetails.subtitle + " This event is archived and registrations are closed." : resolvedDetails.subtitle;
+		overview.textContent = resolvedDetails.overview;
 		registerBtn.href = archived ? "#" : "register.html?event=" + encodeURIComponent(eventName);
 		registerBtn.textContent = archived ? "Archived Event" : "Register";
 		registerBtn.classList.toggle("is-disabled", archived);
 		registerBtn.setAttribute("aria-disabled", archived ? "true" : "false");
 		registerBtn.setAttribute("tabindex", archived ? "-1" : "0");
 
-		if (details.image) {
-			photo.src = details.image.src;
-			photo.alt = details.image.alt;
+		if (resolvedDetails.image && resolvedDetails.image.src) {
+			photo.src = resolvedDetails.image.src;
+			photo.alt = resolvedDetails.image.alt || resolvedDetails.title;
 			photoWrap.hidden = false;
 		} else {
 			photoWrap.hidden = true;
 		}
 
-		renderList(scheduleList, details.schedule);
-		renderList(requirementsList, details.requirements);
-		renderList(paymentList, details.payment);
-	}).catch(function () {
-		subtitle.textContent = details.subtitle;
-		overview.textContent = details.overview;
-		registerBtn.href = "register.html?event=" + encodeURIComponent(eventName);
-		registerBtn.textContent = "Register";
-		registerBtn.classList.remove("is-disabled");
-		registerBtn.removeAttribute("aria-disabled");
-		registerBtn.removeAttribute("tabindex");
+		renderList(scheduleList, resolvedDetails.schedule);
+		renderList(requirementsList, resolvedDetails.requirements);
+		renderList(paymentList, resolvedDetails.payment);
+	}
 
-		if (details.image) {
-			photo.src = details.image.src;
-			photo.alt = details.image.alt;
-			photoWrap.hidden = false;
-		} else {
-			photoWrap.hidden = true;
-		}
-
-		renderList(scheduleList, details.schedule);
-		renderList(requirementsList, details.requirements);
-		renderList(paymentList, details.payment);
-	});
+	title.textContent = details.title;
+	window.KUET_API.requestJson(eventsApiPath + "/by-name/" + encodeURIComponent(eventName))
+		.then(function (serverEvent) {
+			applyDetailsToView({
+				title: serverEvent.title || serverEvent.eventName || eventName,
+				subtitle: serverEvent.subtitle || details.subtitle,
+				overview: serverEvent.overview || details.overview,
+				image: serverEvent.imageSrc ? {
+					src: serverEvent.imageSrc,
+					alt: serverEvent.imageAlt || serverEvent.title || serverEvent.eventName || eventName
+				} : null,
+				schedule: Array.isArray(serverEvent.schedule) && serverEvent.schedule.length ? serverEvent.schedule : details.schedule,
+				requirements: Array.isArray(serverEvent.requirements) && serverEvent.requirements.length ? serverEvent.requirements : details.requirements,
+				payment: Array.isArray(serverEvent.payment) && serverEvent.payment.length ? serverEvent.payment : details.payment
+			}, !!serverEvent.isArchived);
+		})
+		.catch(function () {
+			Promise.all([getArchivedEvents(), getEventDetailsOverride(eventName)])
+		.then(function (results) {
+			var archivedEvents = results[0];
+			var overrideDetails = results[1];
+			var mergedDetails = mergeEventDetails(details, overrideDetails, eventName);
+			var archived = archivedEvents.indexOf(eventName) !== -1;
+			applyDetailsToView(mergedDetails, archived);
+		})
+		.catch(function () {
+			applyDetailsToView(details, false);
+		});
+		});
 }
 
 function renderList(target, values) {

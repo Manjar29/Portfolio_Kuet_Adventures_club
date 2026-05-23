@@ -108,35 +108,8 @@
 				<p class="eyebrow">Mark Your Calendar</p>
 				<h2>Upcoming Events</h2>
 			</div>
-			<div class="event-list">
-				<article class="event-item" data-event-name="Sundarbans Eco Exploration">
-					<p class="event-date">May 03, 2026</p>
-					<h3>Sundarbans Eco Exploration</h3>
-					<p>Nature observation, responsible travel workshop, and mangrove awareness camp.</p>
-					<div class="event-actions">
-						<a href="event.html?event=Sundarbans%20Eco%20Exploration" class="btn event-view-btn">View Event</a>
-						<a href="register.html?event=Sundarbans%20Eco%20Exploration" class="btn btn-primary event-register-btn">Register</a>
-					</div>
-				</article>
-				<article class="event-item" data-event-name="KUET to Bagerhat Cycling Run">
-					<p class="event-date">May 17, 2026</p>
-					<h3>KUET to Bagerhat Cycling Run</h3>
-					<p>70 km endurance ride with hydration checkpoints and riding discipline drills.</p>
-					<div class="event-actions">
-						<a href="event.html?event=KUET%20to%20Bagerhat%20Cycling%20Run" class="btn event-view-btn">View Event</a>
-						<a href="register.html?event=KUET%20to%20Bagerhat%20Cycling%20Run" class="btn btn-primary event-register-btn">Register</a>
-					</div>
-				</article>
-				<article class="event-item" data-event-name="Adventure Bootcamp 3.0">
-					<p class="event-date">June 06, 2026</p>
-					<h3>Adventure Bootcamp 3.0</h3>
-					<p>Two-day training on map reading, shelter building, and team challenge circuits.</p>
-					<div class="event-actions">
-						<a href="event.html?event=Adventure%20Bootcamp%203.0" class="btn event-view-btn">View Event</a>
-						<a href="register.html?event=Adventure%20Bootcamp%203.0" class="btn btn-primary event-register-btn">Register</a>
-					</div>
-				</article>
-			</div>
+			<div class="event-list" id="eventList"></div>
+			<p class="events-status" id="eventsStatus" aria-live="polite"></p>
 		</section>
 
 		<section class="section section-alt" id="membership">
@@ -187,8 +160,10 @@
 			</div>
 		</section>
 
-		<script src="p29.js"></script>
 	</main>
+	<script src="copy-protect.js?v=20260523a"></script>
+	<script src="api-client.js?v=20260523c"></script>
+	<script src="p29.js?v=20260523d"></script>
 
 	<footer class="footer">
 		<div class="container footer-wrap">
