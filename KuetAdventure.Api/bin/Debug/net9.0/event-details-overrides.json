@@ -1,0 +1,19 @@
+{
+  "KUET to Bagerhat Cycling Run": {
+    "EventName": "KUET to Bagerhat Cycling Run",
+    "Title": "KUET to Bagerhat Cycling Running",
+    "Subtitle": "Long-distance group cycling event focusing endurance, road discipline, and hydration planning.",
+    "Overview": "A 70 km controlled route ride with mentor checkpoints and pace groups.",
+    "ImageSrc": "cycling.webp",
+    "ImageAlt": "KUET Adventure Club cycling event photo",
+    "Schedule": [
+      "Bike check and briefing: 5:00 AMRide start: 5:45 AMCheckpoint breaks every 20 kmExpected return: 2:00 PM"
+    ],
+    "Requirements": [
+      "Helmet and front-back lightsRoadworthy cycle with brakesTwo water bottlesEmergency contact number"
+    ],
+    "Payment": [
+      "Registration fee: 500 BDTbKash number: 01718-112233Bank account number: 123456789013Payment method: bKash (merchant) or bank transferTransaction format: bk \u002B last 4 digits (example: bk4455)Provide transaction ID during registration"
+    ]
+  }
+}

@@ -1,3 +1,5 @@
 {
-    "liveServer.settings.port": 5502
+    "liveServer.settings.port": 5502,
+    "dotnet.preferCSharpExtension": true,
+    "dotnet.defaultSolution": "Portfolio.sln"
 }
