@@ -581,7 +581,7 @@ public class EventsController : ControllerBase
             return records;
         }
 
-        await using var stream = System.IO.File.OpenRead(EventCatalogFilePath);
+        await using var stream = new System.IO.FileStream(EventCatalogFilePath, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.ReadWrite);
         var data = await JsonSerializer.DeserializeAsync<List<EventCatalogRecord>>(stream, JsonOptions) ?? [];
         var normalizedRecords = data.Select(NormalizeRecord).ToList();
         if (EnsureExpiredArchived(normalizedRecords))
@@ -666,7 +666,7 @@ public class EventsController : ControllerBase
             return [];
         }
 
-        await using var stream = System.IO.File.OpenRead(LegacyArchiveFilePath);
+        await using var stream = new System.IO.FileStream(LegacyArchiveFilePath, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.ReadWrite);
         var events = await JsonSerializer.DeserializeAsync<List<string>>(stream, JsonOptions);
         return events ?? [];
     }
@@ -678,7 +678,7 @@ public class EventsController : ControllerBase
             return new Dictionary<string, EventDetailsDto>(StringComparer.OrdinalIgnoreCase);
         }
 
-        await using var stream = System.IO.File.OpenRead(LegacyEventDetailsOverridesFilePath);
+        await using var stream = new System.IO.FileStream(LegacyEventDetailsOverridesFilePath, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.ReadWrite);
         var data = await JsonSerializer.DeserializeAsync<Dictionary<string, EventDetailsDto>>(stream, JsonOptions);
         return data ?? new Dictionary<string, EventDetailsDto>(StringComparer.OrdinalIgnoreCase);
     }
@@ -686,7 +686,8 @@ public class EventsController : ControllerBase
     private static async Task WriteCatalogAsync(List<EventCatalogRecord> records)
     {
         Directory.CreateDirectory(Path.GetDirectoryName(EventCatalogFilePath)!);
-        await using var stream = System.IO.File.Create(EventCatalogFilePath);
+        // Write via FileStream with shared read access so concurrent readers (static server, editors) don't lock us out.
+        await using var stream = new System.IO.FileStream(EventCatalogFilePath, System.IO.FileMode.Create, System.IO.FileAccess.Write, System.IO.FileShare.Read);
         await JsonSerializer.SerializeAsync(stream, records.OrderBy(item => item.Id).ToList(), JsonOptions);
     }
 }

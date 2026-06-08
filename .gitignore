@@ -1,0 +1,20 @@
+# Build outputs
+bin/
+obj/
+
+# VS Code settings
+.vscode/
+
+# Runtime JSON used by API
+KuetAdventure.Api/bin/
+KuetAdventure.Api/obj/
+**/events-catalog.json
+**/event-registrations.json
+**/event-registrations-deleted.json
+
+# User files
+*.user
+
+# NuGet
+*.nupkg
+packages/
