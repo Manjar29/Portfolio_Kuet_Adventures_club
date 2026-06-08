@@ -38,10 +38,10 @@
 		// Ensure public pages forward Admin links to the login gate.
 		try {
 			var current = (window.location.pathname || "").toLowerCase();
-			if (!current.endsWith("/admin.html") && !current.endsWith("admin.html")) {
+			var isPublicPage = current.endsWith("/p29.html") || current.endsWith("p29.html") || current.endsWith("/index.html") || current.endsWith("index.html") || current === "";
+			if (isPublicPage) {
 				var anchors = document.querySelectorAll('a[href$="admin.html"]');
 				anchors.forEach(function (a) {
-					// Preserve existing target if present
 					a.setAttribute('href', 'AdminLogin.html?returnUrl=admin.html');
 				});
 			}

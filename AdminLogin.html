@@ -80,6 +80,7 @@
 		</section>
 	</main>
 
+	<script src="admin-auth.js?v=20260609a"></script>
 	<script>
 		(function () {
 			var form = document.getElementById("adminLoginForm");
@@ -88,14 +89,11 @@
 			var rememberInput = document.getElementById("rememberAdmin");
 			var status = document.getElementById("loginStatus");
 			var params = new URLSearchParams(window.location.search);
-			var returnUrl = params.get("returnUrl") || "admin-registrations.html";
+			var returnUrl = params.get("returnUrl") || "admin.html";
 
-			function setCookie(name, value, maxAgeSeconds) {
-				var cookie = name + "=" + encodeURIComponent(value) + "; path=/";
-				if (typeof maxAgeSeconds === "number") {
-					cookie += "; max-age=" + maxAgeSeconds;
-				}
-				document.cookie = cookie;
+			if (window.KUET_ADMIN_AUTH && window.KUET_ADMIN_AUTH.isAuthenticated()) {
+				window.location.replace(returnUrl);
+				return;
 			}
 
 			form.addEventListener("submit", function (event) {
@@ -105,13 +103,10 @@
 				var pass = passInput.value;
 
 				if (user === "admin" && pass === "admin123") {
-					sessionStorage.setItem("kuetAdminSession", "1");
-					if (rememberInput.checked) {
-						setCookie("kuetAdminAuth", "1", 60 * 60 * 24 * 7);
-					} else {
-						setCookie("kuetAdminAuth", "1");
+					if (window.KUET_ADMIN_AUTH) {
+						window.KUET_ADMIN_AUTH.setAuthenticated(rememberInput.checked);
 					}
-					window.location.href = returnUrl;
+					window.location.replace(returnUrl);
 					return;
 				}
 

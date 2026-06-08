@@ -18,8 +18,36 @@
 		return result;
 	}
 
+	function getExplicitApiBase() {
+		if (typeof window !== "undefined" && window.KUET_API_BASE) {
+			return normalizeBaseUrl(window.KUET_API_BASE);
+		}
+
+		if (typeof document !== "undefined" && document.querySelector) {
+			var meta = document.querySelector('meta[name="kuet-api-base"]');
+			if (meta) {
+				var content = meta.getAttribute("content");
+				if (content) {
+					return normalizeBaseUrl(content);
+				}
+			}
+		}
+
+		return "";
+	}
+
 	function getApiBaseCandidates() {
 		var candidates = [];
+		var explicitBase = getExplicitApiBase();
+		var currentOrigin = (typeof window !== "undefined" && window.location && window.location.origin) ? normalizeBaseUrl(window.location.origin) : "";
+
+		if (explicitBase && /^https?:\/\//i.test(explicitBase)) {
+			candidates.push(explicitBase);
+		}
+
+		if (currentOrigin && /^https?:\/\//i.test(currentOrigin)) {
+			candidates.push(currentOrigin);
+		}
 
 		candidates.push("http://localhost:5136");
 		candidates.push("http://127.0.0.1:5136");
@@ -27,6 +55,8 @@
 		candidates.push("https://127.0.0.1:7256");
 		candidates.push("http://localhost:5000");
 		candidates.push("http://127.0.0.1:5000");
+		candidates.push("https://localhost:5000");
+		candidates.push("https://127.0.0.1:5000");
 
 		return unique(candidates
 			.map(normalizeBaseUrl)
@@ -35,16 +65,21 @@
 			}));
 	}
 
+	function isJsonResponse(response) {
+		var contentType = response.headers && response.headers.get ? response.headers.get("content-type") : "";
+		return !!contentType && /json/i.test(contentType);
+	}
+
 	function isRetryableResponse(response, options) {
 		var method = (options && options.method ? String(options.method) : "GET").toUpperCase();
 		if (method === "GET") {
-			return response.status === 501;
+			return response.status === 404 || response.status === 405 || response.status === 501;
 		}
 
 		return response.status === 404 || response.status === 405 || response.status === 501;
 	}
 
-	function requestFromCandidate(path, options, index, candidates) {
+	function requestFromCandidate(path, options, index, candidates, expectJson) {
 			var requestUrl = candidates[index] + path;
 
 			// Diagnostic log to help debug network errors in the browser console
@@ -54,11 +89,15 @@
 
 			return fetch(requestUrl, options).then(function (response) {
 				if (response.ok) {
+					if (expectJson && !isJsonResponse(response) && index < candidates.length - 1) {
+						return requestFromCandidate(path, options, index + 1, candidates, expectJson);
+					}
+
 					return response;
 				}
 
 				if (index < candidates.length - 1 && isRetryableResponse(response, options)) {
-					return requestFromCandidate(path, options, index + 1, candidates);
+					return requestFromCandidate(path, options, index + 1, candidates, expectJson);
 				}
 
 				return response;
@@ -69,7 +108,7 @@
 				}
 
 				if (index < candidates.length - 1) {
-					return requestFromCandidate(path, options, index + 1, candidates);
+					return requestFromCandidate(path, options, index + 1, candidates, expectJson);
 				}
 
 				// When all candidates failed, throw a richer error that includes tried hosts
@@ -81,11 +120,11 @@
 	}
 
 	function requestApi(path, options) {
-		return requestFromCandidate(path, options, 0, getApiBaseCandidates());
+		return requestFromCandidate(path, options, 0, getApiBaseCandidates(), false);
 	}
 
 	function requestJson(path, options) {
-		return requestApi(path, options).then(function (response) {
+		return requestFromCandidate(path, options, 0, getApiBaseCandidates(), true).then(function (response) {
 			if (!response.ok) {
 				throw new Error("Request failed with status " + response.status + ".");
 			}

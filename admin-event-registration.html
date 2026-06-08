@@ -79,8 +79,15 @@
 
 	<script src="api-client.js?v=20260523c"></script>
 	<script src="copy-protect.js?v=20260523a"></script>
+	<script src="admin-auth.js?v=20260609a"></script>
 	<script>
 		(function () {
+			if (window.KUET_ADMIN_AUTH) {
+				if (!window.KUET_ADMIN_AUTH.requireAuth('admin-event-registration.html' + window.location.search)) {
+					return;
+				}
+			}
+
 			var params = new URLSearchParams(window.location.search);
 			var id = params.get("id");
 			var title = document.getElementById("registrationTitle");

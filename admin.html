@@ -113,7 +113,7 @@
 				<div class="card">
 					<h3>Manage Registrations</h3>
 					<p>Review submitted club memberships and approve or delete requests.</p>
-					<a class="btn btn-primary" href="AdminLogin.html?returnUrl=admin-registrations.html">View Registrations</a>
+					<a class="btn btn-primary" href="admin-registrations.html">View Registrations</a>
 				</div>
 
 				<div class="card">
@@ -154,22 +154,13 @@
 		</section>
 	</main>
 
+	<script src="admin-auth.js?v=20260609a"></script>
 	<script src="copy-protect.js?v=20260523a"></script>
 	<script src="api-client.js?v=20260523c"></script>
 	<script>
-		// Require admin authentication for this page.
 		(function () {
-			function isAuthenticated() {
-				try {
-					if (sessionStorage.getItem('kuetAdminSession') === '1') return true;
-					if (document.cookie && document.cookie.indexOf('kuetAdminAuth=1') !== -1) return true;
-				} catch (e) { }
-				return false;
-			}
-
-			if (!isAuthenticated()) {
-				var returnUrl = encodeURIComponent(location.pathname.substring(location.pathname.lastIndexOf('/') + 1));
-				location.replace('AdminLogin.html?returnUrl=' + returnUrl);
+			if (window.KUET_ADMIN_AUTH) {
+				window.KUET_ADMIN_AUTH.requireAuth('admin.html');
 			}
 		})();
 	</script>

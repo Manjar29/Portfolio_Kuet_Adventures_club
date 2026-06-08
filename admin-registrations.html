@@ -122,6 +122,7 @@
 		</section>
 	</main>
 
+	<script src="admin-auth.js?v=20260609a"></script>
 	<script src="api-client.js?v=20260523c"></script>
 	<script src="copy-protect.js?v=20260523a"></script>
 	<script>
@@ -132,29 +133,16 @@
 			var logoutLink = document.getElementById("logoutLink");
 			var apiPath = "/api/memberships";
 
-			function getCookie(name) {
-				var match = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "=([^;]*)"));
-				return match ? decodeURIComponent(match[1]) : "";
-			}
-
-			function isAdminAuthenticated() {
-				return sessionStorage.getItem("kuetAdminSession") === "1" || getCookie("kuetAdminAuth") === "1";
-			}
-
-			function clearAuth() {
-				sessionStorage.removeItem("kuetAdminSession");
-				document.cookie = "kuetAdminAuth=; path=/; max-age=0";
-			}
-
-			if (!isAdminAuthenticated()) {
-				window.location.href = "AdminLogin.html?returnUrl=admin-registrations.html";
+			if (window.KUET_ADMIN_AUTH && !window.KUET_ADMIN_AUTH.requireAuth("admin-registrations.html")) {
 				return;
 			}
 
 			authStatus.textContent = "Admin access granted.";
 			logoutLink.addEventListener("click", function (event) {
 				event.preventDefault();
-				clearAuth();
+				if (window.KUET_ADMIN_AUTH) {
+					window.KUET_ADMIN_AUTH.clearAuthentication();
+				}
 				window.location.href = "AdminLogin.html";
 			});
 
