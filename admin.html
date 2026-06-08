@@ -157,6 +157,23 @@
 	<script src="copy-protect.js?v=20260523a"></script>
 	<script src="api-client.js?v=20260523c"></script>
 	<script>
+		// Require admin authentication for this page.
+		(function () {
+			function isAuthenticated() {
+				try {
+					if (sessionStorage.getItem('kuetAdminSession') === '1') return true;
+					if (document.cookie && document.cookie.indexOf('kuetAdminAuth=1') !== -1) return true;
+				} catch (e) { }
+				return false;
+			}
+
+			if (!isAuthenticated()) {
+				var returnUrl = encodeURIComponent(location.pathname.substring(location.pathname.lastIndexOf('/') + 1));
+				location.replace('AdminLogin.html?returnUrl=' + returnUrl);
+			}
+		})();
+	</script>
+	<script>
 		(function () {
 			var eventsCatalogApiPath = "/api/events/catalog?includeArchived=true";
 			var archiveByIdApiPath = "/api/events/catalog";
@@ -197,7 +214,7 @@
 							eventByName[item.eventName] = item;
 						});
 
-						var optionsHtml = events.map(function (item) {
+						var optionsHtml = "<option value=''>All events</option>" + events.map(function (item) {
 							return "<option value='" + escapeHtml(item.eventName) + "'>" + escapeHtml(item.eventName) + "</option>";
 						}).join("");
 
@@ -288,10 +305,14 @@
 			}
 
 			function renderEventRegistrations(eventName) {
-				eventRegistrationHeading.textContent = eventName + " registrations";
+				eventRegistrationHeading.textContent = eventName ? (eventName + " registrations") : "All event registrations";
 				eventRegistrationStatus.textContent = "Loading registrations...";
 
-				return window.KUET_API.requestJson(eventRegistrationsApiPath + "?eventName=" + encodeURIComponent(eventName))
+				var requestPath = eventName
+					? eventRegistrationsApiPath + "?eventName=" + encodeURIComponent(eventName)
+					: eventRegistrationsApiPath;
+
+				return window.KUET_API.requestJson(requestPath)
 					.then(function (rows) {
 						if (!Array.isArray(rows) || rows.length === 0) {
 							eventRegistrationStatus.textContent = "No registrations for this event yet.";
@@ -323,11 +344,6 @@
 
 			function refreshEventRegistrations() {
 				var eventName = eventRegistrationSelect.value;
-				if (!eventName) {
-					eventRegistrationBody.innerHTML = "";
-					return Promise.resolve();
-				}
-
 				return Promise.all([
 					window.KUET_API.requestJson(eventRegistrationSummaryApiPath).then(function (summary) {
 						renderEventRegistrationSummary(summary);

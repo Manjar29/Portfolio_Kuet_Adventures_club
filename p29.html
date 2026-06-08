@@ -22,7 +22,7 @@
 				<li><a href="#events">Events</a></li>
 				<li><a href="#membership">Membership</a></li>
 				<li><a href="#contact">Contact</a></li>
-				<li><a href="admin.html">Admin</a></li>
+				<li><a href="AdminLogin.html?returnUrl=admin.html" id="adminLink">Admin</a></li>
 			</ul>
 		</nav>
 
@@ -164,6 +164,29 @@
 	<script src="copy-protect.js?v=20260523a"></script>
 	<script src="api-client.js?v=20260523c"></script>
 	<script src="p29.js?v=20260523d"></script>
+	<script>
+		// Ensure admin link requires login. Single sign-on via sessionStorage or cookie.
+		(function () {
+			function isAuthenticated() {
+				try {
+					if (sessionStorage.getItem('kuetAdminSession') === '1') return true;
+					if (document.cookie && document.cookie.indexOf('kuetAdminAuth=1') !== -1) return true;
+				} catch (e) { }
+				return false;
+			}
+
+			var adminLink = document.getElementById('adminLink');
+			if (!adminLink) return;
+			adminLink.addEventListener('click', function (e) {
+				e.preventDefault();
+				if (isAuthenticated()) {
+					location.href = 'admin.html';
+					return;
+				}
+				location.href = 'AdminLogin.html?returnUrl=admin.html';
+			});
+		})();
+	</script>
 
 	<footer class="footer">
 		<div class="container footer-wrap">

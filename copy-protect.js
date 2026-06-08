@@ -34,6 +34,18 @@
 				blockEvent(event);
 			}
 		}, true);
+
+		// Ensure public pages forward Admin links to the login gate.
+		try {
+			var current = (window.location.pathname || "").toLowerCase();
+			if (!current.endsWith("/admin.html") && !current.endsWith("admin.html")) {
+				var anchors = document.querySelectorAll('a[href$="admin.html"]');
+				anchors.forEach(function (a) {
+					// Preserve existing target if present
+					a.setAttribute('href', 'AdminLogin.html?returnUrl=admin.html');
+				});
+			}
+		} catch (e) { /* no-op */ }
 	}
 
 	if (document.readyState === "loading") {
