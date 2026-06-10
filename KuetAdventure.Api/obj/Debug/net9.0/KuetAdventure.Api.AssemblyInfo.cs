@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("KuetAdventure.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4d8ab93974540b18f8eff05c24793a9b32b07abc")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+83a36e007a6f28a7444c8e014a8f933553c7beba")]
 [assembly: System.Reflection.AssemblyProductAttribute("KuetAdventure.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("KuetAdventure.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
