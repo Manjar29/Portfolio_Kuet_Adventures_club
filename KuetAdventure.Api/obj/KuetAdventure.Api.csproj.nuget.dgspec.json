@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Acer\\OneDrive\\Desktop\\Portfolio\\KuetAdventure.Api\\KuetAdventure.Api.csproj": {}
+    "c:\\Users\\Acer\\OneDrive\\Desktop\\Portfolio\\KuetAdventure.Api\\KuetAdventure.Api.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Acer\\OneDrive\\Desktop\\Portfolio\\KuetAdventure.Api\\KuetAdventure.Api.csproj": {
+    "c:\\Users\\Acer\\OneDrive\\Desktop\\Portfolio\\KuetAdventure.Api\\KuetAdventure.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Acer\\OneDrive\\Desktop\\Portfolio\\KuetAdventure.Api\\KuetAdventure.Api.csproj",
+        "projectUniqueName": "c:\\Users\\Acer\\OneDrive\\Desktop\\Portfolio\\KuetAdventure.Api\\KuetAdventure.Api.csproj",
         "projectName": "KuetAdventure.Api",
-        "projectPath": "C:\\Users\\Acer\\OneDrive\\Desktop\\Portfolio\\KuetAdventure.Api\\KuetAdventure.Api.csproj",
+        "projectPath": "c:\\Users\\Acer\\OneDrive\\Desktop\\Portfolio\\KuetAdventure.Api\\KuetAdventure.Api.csproj",
         "packagesPath": "C:\\Users\\Acer\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Acer\\OneDrive\\Desktop\\Portfolio\\KuetAdventure.Api\\obj\\",
+        "outputPath": "c:\\Users\\Acer\\OneDrive\\Desktop\\Portfolio\\KuetAdventure.Api\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
